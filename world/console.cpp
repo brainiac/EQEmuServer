@@ -46,6 +46,7 @@ using namespace std;
 #include "LauncherList.h"
 #include "ucs.h"
 #include "queryserv.h"
+#include "utilserver.h"
 
 #ifdef _WINDOWS
 	#define snprintf	_snprintf
@@ -63,6 +64,7 @@ extern ClientList client_list;
 extern LauncherList launcher_list;
 extern UCSConnection UCSLink;
 extern QueryServConnection QSLink;
+extern UtilServerConnection UtilServerLink;
 extern volatile bool	RunLoops;
 
 ConsoleList console_list;
@@ -257,11 +259,15 @@ bool Console::Process() {
 			_log(WORLD__CONSOLE,"New UCS Connection from %s:%d", inet_ntoa(in), GetPort());
 			UCSLink.SetConnection(tcpc);
 			tcpc = 0;
-		}
-			else if(tcpc->GetPacketMode() == EmuTCPConnection::packetModeQueryServ)
+		} else if(tcpc->GetPacketMode() == EmuTCPConnection::packetModeQueryServ)
 		{
 			_log(WORLD__CONSOLE,"New QS Connection from %s:%d", inet_ntoa(in), GetPort());
 			QSLink.SetConnection(tcpc);
+			tcpc = 0;
+		} else if(tcpc->GetPacketMode() == EmuTCPConnection::packetModeUtilServer)
+		{
+			_log(WORLD__CONSOLE,"New UtilServer Connection from %s:%d", inet_ntoa(in), GetPort());
+			UtilServerLink.SetConnection(tcpc);
 			tcpc = 0;
 		} else {
 			_log(WORLD__CONSOLE,"Unsupported packet mode from %s:%d", inet_ntoa(in), GetPort());

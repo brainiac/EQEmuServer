@@ -188,6 +188,8 @@
 #define ServerOP_QSPlayerLogMoves		   0x4014
 #define ServerOP_QSMerchantLogTransactions 0x4015
 
+#define ServerOP_UtilServerGeneric         0x5000
+
 enum { QSG_LFGuild = 0 };
 enum {	QSG_LFGuild_PlayerMatches = 0, QSG_LFGuild_UpdatePlayerInfo, QSG_LFGuild_RequestPlayerInfo, QSG_LFGuild_UpdateGuildInfo, QSG_LFGuild_GuildMatches,
 	QSG_LFGuild_RequestGuildInfo };

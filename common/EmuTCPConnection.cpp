@@ -391,6 +391,22 @@ bool EmuTCPConnection::LineOutQueuePush(char* line) {
 			safe_delete_array(line);
 			return(true);
 		}
+		if (strcmp(line, "**PACKETMODEUTILSERV**") == 0) {
+			MSendQueue.lock();
+			safe_delete_array(sendbuf);
+			if (TCPMode == modeConsole)
+				Send((const uchar*) "\0**PACKETMODEUTILSERV**\r", 24);
+			TCPMode = modePacket;
+			PacketMode = packetModeUtilServer;
+			EmuTCPNetPacket_Struct* tnps = 0;
+			while ((tnps = InModeQueue.pop())) {
+				SendPacket(tnps);
+				safe_delete_array(tnps);
+			}
+			MSendQueue.unlock();
+			safe_delete_array(line);
+			return(true);
+		}
 
 	}
 	
@@ -444,6 +460,13 @@ bool EmuTCPConnection::ConnectIP(uint32 irIP, uint16 irPort, char* errbuf) {
 				sendbuf_used = sendbuf_size;
 				sendbuf = new uchar[sendbuf_size];
 				memcpy(sendbuf, "\0**PACKETMODEQS**\r", sendbuf_size);
+			}
+			else if(PacketMode == packetModeUtilServer) {
+				safe_delete_array(sendbuf);
+				sendbuf_size = 24;
+				sendbuf_used = sendbuf_size;
+				sendbuf = new uchar[sendbuf_size];
+				memcpy(sendbuf, "\0**PACKETMODEUTILSERV**\r", sendbuf_size);
 			} else {
 				//default: packetModeZone
 				safe_delete_array(sendbuf);

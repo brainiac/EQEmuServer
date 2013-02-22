@@ -1,22 +1,24 @@
-#ifndef QueryServ_H
-#define QueryServ_H
+#ifndef UtilServer_H__
+#define UtilServer_H__
 
 #include "../common/types.h"
 #include "../common/EmuTCPConnection.h"
 #include "../common/servertalk.h"
 
-class QueryServConnection
+class UtilServerConnection
 {
 public:
-	QueryServConnection();
-	void SetConnection(EmuTCPConnection *inStream);
+	UtilServerConnection();
+
+	void SetConnection(EmuTCPConnection* inStream);
 	bool Process();
 	bool SendPacket(ServerPacket* pack);
 	void Disconnect() { if(Stream) Stream->Disconnect(); }
+
 private:
 	inline uint32 GetIP() const { return Stream ? Stream->GetrIP() : 0; }
-	EmuTCPConnection *Stream;
+	EmuTCPConnection* Stream;
 	bool authenticated;
 };
 
-#endif /*QueryServ_H_*/
+#endif // UtilServer_H__
