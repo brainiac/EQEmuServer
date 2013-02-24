@@ -76,10 +76,10 @@ int UtilServer::Initialize()
 
 	m_database = new Database();
 	if (!m_database->Connect(
-		m_config->DatabaseHost.c_str(),
-		m_config->DatabaseUsername.c_str(),
-		m_config->DatabasePassword.c_str(),
-		m_config->DatabaseDB.c_str(),
+		m_config->DatabaseHost,
+		m_config->DatabaseUsername,
+		m_config->DatabasePassword,
+		m_config->DatabaseDB,
 		m_config->DatabasePort))
 	{
 		_log(UTILSERVER__ERROR, "Cannot continue without a database connection.");

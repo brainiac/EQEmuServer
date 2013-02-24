@@ -19,34 +19,7 @@
 
 */
 
-
-#include "../common/debug.h"
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errmsg.h>
-#include <mysqld_error.h>
-#include <limits.h>
-#include <ctype.h>
-#include <assert.h>
-#include <map>
-
-// Disgrace: for windows compile
-#ifdef _WINDOWS
-#include <windows.h>
-#define snprintf	_snprintf
-#define strncasecmp	_strnicmp
-#define strcasecmp	_stricmp
-#else
-#include "../common/unix.h"
-#include <netinet/in.h>
-#endif
-
 #include "database.h"
-#include "../common/eq_packet_structs.h"
-#include "../common/MiscFunctions.h"
-#include "../common/servertalk.h"
 
 Database::Database()
 {
@@ -54,22 +27,24 @@ Database::Database()
 }
 
 Database::~Database()
-{	
+{
 }
 
 // Establish a connection to a mysql database with the supplied parameters
-Database::Database(const char* host, const char* user, const char* password, const char* database, uint32 port)
+Database::Database(const std::string& host, const std::string& user, const std::string& password,
+	const std::string& database, uint32 port)
 {
 	DBInitVars();
 	Connect(host, user, password, database, port);
 }
 
-bool Database::Connect(const char* host, const char* user, const char* password, const char* database, uint32 port)
+bool Database::Connect(const std::string& host, const std::string& user, const std::string& password,
+	const std::string& database, uint32 port)
 {
 	uint32 errnum = 0;
 	char errbuf[MYSQL_ERRMSG_SIZE];
 
-	if (!Open(host, user, password, database, port, &errnum, errbuf))
+	if (!Open(host.c_str(), user.c_str(), password.c_str(), database.c_str(), port, &errnum, errbuf))
 	{
 		LogFile->write(EQEMuLog::Error, "Failed to connect to database: Error: %s", errbuf);
 		HandleMysqlError(errnum);
@@ -78,7 +53,7 @@ bool Database::Connect(const char* host, const char* user, const char* password,
 	}
 	else
 	{
-		LogFile->write(EQEMuLog::Status, "Using database '%s' at %s:%d", database, host, port);
+		LogFile->write(EQEMuLog::Status, "Using database '%s' at %s:%d", database.c_str(), host.c_str(), port);
 		return true;
 	}
 }
@@ -90,4 +65,3 @@ void Database::DBInitVars()
 void Database::HandleMysqlError(uint32 errnum)
 {
 }
-

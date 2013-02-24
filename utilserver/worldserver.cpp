@@ -16,7 +16,6 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-
 #include "worldserver.h"
 #include "database.h"
 
@@ -35,10 +34,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-
 WorldServer::WorldServer(const EQEmuConfig* config_)
   : WorldConnection(EmuTCPConnection::packetModeUtilServer, config_->SharedKey.c_str()),
- 	m_config(config_)
+	m_config(config_)
 {
 	pTryReconnect = true;
 }
@@ -89,4 +87,3 @@ void WorldServer::Process()
 	safe_delete(pack);
 	return;
 }
-

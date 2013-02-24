@@ -15,8 +15,9 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef WORLDSERVER_H
-#define WORLDSERVER_H
+
+#ifndef WORLDSERVER_H__
+#define WORLDSERVER_H__
 
 #include "../common/worldconn.h"
 #include "../common/eq_packet_structs.h"
@@ -29,11 +30,11 @@ public:
 	WorldServer(const EQEmuConfig* config);
 	virtual ~WorldServer();
 	virtual void Process();
-	
+
 private:
 	virtual void OnConnected();
 
 	const EQEmuConfig* m_config;
 };
 
-#endif
+#endif // !WORLDSERVER_H__

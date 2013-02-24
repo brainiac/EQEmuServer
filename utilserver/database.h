@@ -30,9 +30,8 @@
 #include "../common/dbcore.h"
 #include "../common/linked_list.h"
 #include "../common/servertalk.h"
+
 #include <string>
-#include <vector>
-#include <map>
 
 class Database : public DBcore
 {
@@ -40,15 +39,15 @@ public:
 	Database();
 	~Database();
 
-	Database(const char* host, const char* user, const char* password, const char* database, uint32 port);
+	Database(const std::string& host, const std::string& user, const std::string& password,
+		const std::string& database, uint32 port);
 
-	bool Connect(const char* host, const char* user, const char* password, const char* database, uint32 port);
-
-	bool GetVariable(const char* varname, char* varValue, uint16 varValue_len);
+	bool Connect(const std::string& host, const std::string& user,
+		const std::string&password, const std::string& database, uint32 port);
 
 private:
 	void HandleMysqlError(uint32 errnum);
 	void DBInitVars();
 };
 
-#endif
+#endif // !UTILSERVER_DATABASE_H__
