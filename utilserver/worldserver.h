@@ -21,19 +21,19 @@
 #include "../common/worldconn.h"
 #include "../common/eq_packet_structs.h"
 
-class UtilServerConfig;
+class EQEmuConfig;
 
 class WorldServer : public WorldConnection
 {
 public:
-	WorldServer(const UtilServerConfig* config);
+	WorldServer(const EQEmuConfig* config);
 	virtual ~WorldServer();
 	virtual void Process();
 	
 private:
 	virtual void OnConnected();
 
-    const UtilServerConfig* m_config;
+	const EQEmuConfig* m_config;
 };
 
 #endif

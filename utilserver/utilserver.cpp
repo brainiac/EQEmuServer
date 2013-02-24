@@ -21,11 +21,11 @@
 
 #include "utilserver.h"
 #include "database.h"
-#include "utilserverconfig.h"
 #include "worldserver.h"
 
 #include "../common/debug.h"
 #include "../common/opcodemgr.h"
+#include "../common/EQEmuConfig.h"
 #include "../common/EQStreamFactory.h"
 #include "../common/rulesys.h"
 #include "../common/servertalk.h"
@@ -57,13 +57,13 @@ int UtilServer::Initialize()
 {
 	_log(UTILSERVER__INIT, "Starting EQEmu UtilityServer");
 
-	if (!UtilServerConfig::LoadConfig())
+	if (!EQEmuConfig::LoadConfig())
 	{
 		_log(UTILSERVER__INIT, "Loading server configuration failed.");
 		return 1;
 	}
 
-	m_config = UtilServerConfig::get();
+	m_config = EQEmuConfig::get();
 
 	if (!load_log_settings(m_config->LogSettingsFile.c_str()))
 		_log(UTILSERVER__INIT, "Warning: Unable to read %s", m_config->LogSettingsFile.c_str());

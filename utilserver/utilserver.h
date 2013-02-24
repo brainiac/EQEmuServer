@@ -26,7 +26,7 @@
 
 class Database;
 class WorldServer;
-class UtilServerConfig;
+class EQEmuConfig;
 
 class UtilServer
 {
@@ -42,7 +42,7 @@ public:
 private:
 	WorldServer* m_worldServer;
 	Database* m_database;
-	const UtilServerConfig* m_config;
+	const EQEmuConfig* m_config;
 
 	volatile bool m_runLoop;
 	std::string m_shortName;

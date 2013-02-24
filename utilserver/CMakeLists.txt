@@ -4,14 +4,12 @@ SET(utilserver_sources
     database.cpp
     main.cpp
     utilserver.cpp
-    utilserverconfig.cpp
     worldserver.cpp
 )
 
 SET(utilserver_headers
     database.h
     utilserver.h
-    utilserverconfig.h
     worldserver.h
 )
 

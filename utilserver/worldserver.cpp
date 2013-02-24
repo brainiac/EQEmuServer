@@ -16,7 +16,17 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+
+#include "worldserver.h"
+#include "database.h"
+
 #include "../common/debug.h"
+#include "../common/servertalk.h"
+#include "../common/packet_functions.h"
+#include "../common/md5.h"
+#include "../common/packet_dump.h"
+#include "../common/EQEmuConfig.h"
+
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
@@ -25,19 +35,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "../common/servertalk.h"
-#include "worldserver.h"
-#include "utilserverconfig.h"
-#include "database.h"
 
-#include "../common/packet_functions.h"
-#include "../common/md5.h"
-#include "../common/packet_dump.h"
-
-extern WorldServer worldserver;
-extern Database database;
-
-WorldServer::WorldServer(const UtilServerConfig* config_)
+WorldServer::WorldServer(const EQEmuConfig* config_)
   : WorldConnection(EmuTCPConnection::packetModeUtilServer, config_->SharedKey.c_str()),
  	m_config(config_)
 {
