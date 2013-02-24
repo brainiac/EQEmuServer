@@ -20,7 +20,7 @@ void UtilServerConnection::SetConnection(EmuTCPConnection* inStream)
 {
 	if (Stream)
 	{
-		_log(UTILSERVER__ERROR, "Incoming UtilityServer connection while we were already connected to a Utility Server.h");
+		_log(UTILSERVER__ERROR, "Incoming UtilityServer connection while we were already connected to a UtilServer");
 		Stream->Disconnect();
 	}
 

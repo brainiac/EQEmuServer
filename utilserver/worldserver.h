@@ -21,15 +21,19 @@
 #include "../common/worldconn.h"
 #include "../common/eq_packet_structs.h"
 
+class UtilServerConfig;
+
 class WorldServer : public WorldConnection
 {
 public:
-	WorldServer();
+	WorldServer(const UtilServerConfig* config);
 	virtual ~WorldServer();
 	virtual void Process();
 	
 private:
 	virtual void OnConnected();
+
+    const UtilServerConfig* m_config;
 };
 
 #endif

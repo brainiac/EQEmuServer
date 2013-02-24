@@ -1,5 +1,5 @@
 /*
-	EQEMu:  Everquest Server Emulator
+	EQEmu:  Everquest Server Emulator
 
 	Copyright (C) 2001-2008 EQEMu Development Team (http://eqemulator.net)
 
@@ -19,6 +19,11 @@
 
 */
 
+#include "utilserver.h"
+#include "database.h"
+#include "utilserverconfig.h"
+#include "worldserver.h"
+
 #include "../common/debug.h"
 #include "../common/opcodemgr.h"
 #include "../common/EQStreamFactory.h"
@@ -26,92 +31,96 @@
 #include "../common/servertalk.h"
 #include "../common/platform.h"
 #include "../common/crash.h"
-#include "database.h"
-#include "utilserverconfig.h"
-#include "worldserver.h"
-#include <list>
-#include <signal.h>
 
-volatile bool RunLoops = true;
-
-Database database;
-std::string WorldShortName;
+// TODO: This shouldn't be declared here, but the code expects it.
+// currently every server project needs to define this. Seems silly...
 TimeoutManager timeout_manager;
 
-const UtilServerConfig* Config;
-WorldServer* worldserver = 0;
-
-
-void CatchSignal(int sig_num)
+UtilServer::UtilServer()
+  : m_worldServer(0),
+	m_database(0),
+	m_config(0),
+	m_runLoop(true)
 {
-	RunLoops = false;
-	if (worldserver)
-		worldserver->Disconnect();
 }
 
-int main()
+UtilServer::~UtilServer()
 {
-	RegisterExecutablePlatform(ExePlatformUtility);
-	set_exception_handler();
+	delete m_worldServer;
+	m_worldServer = 0;
 
-	Timer InterserverTimer(INTERSERVER_TIMER); // does auto-reconnect
+	delete m_database;
+	m_database = 0;
+}
 
+int UtilServer::Initialize()
+{
 	_log(UTILSERVER__INIT, "Starting EQEmu UtilityServer");
-	
+
 	if (!UtilServerConfig::LoadConfig())
 	{
 		_log(UTILSERVER__INIT, "Loading server configuration failed.");
 		return 1;
 	}
 
-	Config = UtilServerConfig::get();
+	m_config = UtilServerConfig::get();
 
-	if (!load_log_settings(Config->LogSettingsFile.c_str()))
-		_log(UTILSERVER__INIT, "Warning: Unable to read %s", Config->LogSettingsFile.c_str());
+	if (!load_log_settings(m_config->LogSettingsFile.c_str()))
+		_log(UTILSERVER__INIT, "Warning: Unable to read %s", m_config->LogSettingsFile.c_str());
 	else
-		_log(UTILSERVER__INIT, "Log settings loaded from %s", Config->LogSettingsFile.c_str());
+		_log(UTILSERVER__INIT, "Log settings loaded from %s", m_config->LogSettingsFile.c_str());
 
-	WorldShortName = Config->ShortName;
+	m_shortName = m_config->ShortName;
 
 	_log(UTILSERVER__INIT, "Connecting to MySQL...");
-	if (!database.Connect(
-		Config->DatabaseHost.c_str(),
-		Config->DatabaseUsername.c_str(),
-		Config->DatabasePassword.c_str(),
-		Config->DatabaseDB.c_str(),
-		Config->DatabasePort))
+
+	m_database = new Database();
+	if (!m_database->Connect(
+		m_config->DatabaseHost.c_str(),
+		m_config->DatabaseUsername.c_str(),
+		m_config->DatabasePassword.c_str(),
+		m_config->DatabaseDB.c_str(),
+		m_config->DatabasePort))
 	{
 		_log(UTILSERVER__ERROR, "Cannot continue without a database connection.");
 		return 1;
 	}
 
-	if (signal(SIGINT, CatchSignal) == SIG_ERR
-		|| signal(SIGTERM, CatchSignal) == SIG_ERR)
+	m_worldServer = new WorldServer(m_config);
+	m_worldServer->Connect();
+
+	return 0;
+}
+
+void UtilServer::Shutdown()
+{
+	m_runLoop = false;
+
+	if (m_worldServer)
 	{
-		_log(UTILSERVER__ERROR, "Could not set signal handler");
-		return 0;
+		m_worldServer->Disconnect();
 	}
+}
 
-	worldserver = new WorldServer;
-	worldserver->Connect();
+int UtilServer::Run()
+{
+	Timer interserverTimer(INTERSERVER_TIMER); // does auto-reconnect
 
-	while (RunLoops)
+	while (m_runLoop)
 	{
 		Timer::SetCurrentTime();
 
-		if (InterserverTimer.Check())
+		if (interserverTimer.Check())
 		{
-			if (worldserver->TryReconnect() && !worldserver->Connected())
-				worldserver->AsyncConnect();
-
+			if (m_worldServer->TryReconnect() && !m_worldServer->Connected())
+			{
+				m_worldServer->AsyncConnect();
+			}
 		}
 
-		worldserver->Process();
+		m_worldServer->Process();
 
 		timeout_manager.CheckTimeouts();
 		Sleep(100);
 	}
 }
-
-
-

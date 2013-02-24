@@ -35,10 +35,11 @@
 #include "../common/packet_dump.h"
 
 extern WorldServer worldserver;
-extern const UtilServerConfig *Config;
 extern Database database;
 
-WorldServer::WorldServer() : WorldConnection(EmuTCPConnection::packetModeUtilServer, Config->SharedKey.c_str())
+WorldServer::WorldServer(const UtilServerConfig* config_)
+  : WorldConnection(EmuTCPConnection::packetModeUtilServer, config_->SharedKey.c_str()),
+ 	m_config(config_)
 {
 	pTryReconnect = true;
 }

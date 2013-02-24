@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(utilserver_sources
     database.cpp
+    main.cpp
     utilserver.cpp
     utilserverconfig.cpp
     worldserver.cpp
@@ -9,6 +10,7 @@ SET(utilserver_sources
 
 SET(utilserver_headers
     database.h
+    utilserver.h
     utilserverconfig.h
     worldserver.h
 )
