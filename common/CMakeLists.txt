@@ -27,6 +27,7 @@ SET(common_sources
     eqemu_exception.cpp
     eqemu_config.cpp
     eqemu_logsys.cpp
+    eq_guid.cpp
     eq_limits.cpp
     eq_packet.cpp
     eq_stream_ident.cpp
@@ -518,6 +519,7 @@ SET(common_headers
     eqemu_config_elements.h
     eqemu_logsys.h
     eqemu_logsys_log_aliases.h
+    eq_guid.h
     eq_limits.h
     eq_packet.h
     eq_stream_ident.h
