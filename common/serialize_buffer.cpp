@@ -20,4 +20,3 @@ void SerializeBuffer::Reset()
 	m_capacity = 0;
 	m_pos = 0;
 }
-

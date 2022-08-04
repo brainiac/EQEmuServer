@@ -29,6 +29,7 @@
 #include "string_util_test.h"
 #include "data_verification_test.h"
 #include "skills_util_test.h"
+#include "serialize_buffer_test.h"
 #include "task_state_test.h"
 #include "../common/eqemu_config.h"
 
@@ -36,7 +37,7 @@ const EQEmuConfig *Config;
 
 int main() {
 	auto ConfigLoadResult = EQEmuConfig::LoadConfig();
-        Config = EQEmuConfig::get();
+	Config = EQEmuConfig::get();
 	try {
 		std::ofstream outfile("test_output.txt");
 		std::unique_ptr<Test::Output> output(new Test::TextOutput(Test::TextOutput::Verbose, outfile));
@@ -50,6 +51,7 @@ int main() {
 		tests.add(new StringUtilTest());
 		tests.add(new DataVerificationTest());
 		tests.add(new SkillsUtilsTest());
+		tests.add(new SerializeBufferTest());
 		tests.add(new TaskStateTest());
 		tests.run(*output, true);
 	} catch(...) {

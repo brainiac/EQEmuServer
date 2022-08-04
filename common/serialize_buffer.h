@@ -1,33 +1,62 @@
-#ifndef SERIALIZE_BUFFER_H
-#define SERIALIZE_BUFFER_H
+#pragma once
 
 #include <cstring>
 #include <cassert>
 #include <cstdint>
 #include <string>
 
+namespace detail
+{
+	template <typename, typename T>
+	struct has_serialize {
+		static_assert(
+			std::integral_constant<T, false>::value,
+			"Second template parameter needs to be of function type.");
+	};
+
+	// specialization that does the checking
+	template <typename C, typename Ret, typename... Args>
+	struct has_serialize<C, Ret(Args...)> {
+	private:
+		template <typename T>
+		static constexpr auto check_serialize(T*)
+			-> typename std::is_same<
+			decltype(std::declval<T>().Serialize(std::declval<Args>()...)),
+			Ret>::type;
+
+		template <typename>
+		static constexpr std::false_type check_serialize(...);
+
+		using type = decltype(check_serialize<C>(0));
+
+	public:
+		static constexpr bool value = type::value;
+	};
+}
+
 class SerializeBuffer
 {
 public:
-	SerializeBuffer() : m_buffer(nullptr), m_capacity(0), m_pos(0) {}
+	SerializeBuffer() {}
 
-	explicit SerializeBuffer(size_t size) : m_capacity(size), m_pos(0)
+	explicit SerializeBuffer(size_t size)
+		: m_capacity(size)
 	{
-		m_buffer = new unsigned char[size];
+		m_buffer = new uint8_t[size];
 		memset(m_buffer, 0, size);
 	}
 
-	SerializeBuffer(const SerializeBuffer &rhs)
-	    : m_buffer(new unsigned char[rhs.m_capacity]), m_capacity(rhs.m_capacity), m_pos(rhs.m_pos)
+	SerializeBuffer(const SerializeBuffer& rhs)
+		: m_buffer(new uint8_t[rhs.m_capacity]), m_capacity(rhs.m_capacity), m_pos(rhs.m_pos)
 	{
 		memcpy(m_buffer, rhs.m_buffer, rhs.m_capacity);
 	}
 
-	SerializeBuffer &operator=(const SerializeBuffer &rhs)
+	SerializeBuffer& operator=(const SerializeBuffer& rhs)
 	{
 		if (this != &rhs) {
 			delete[] m_buffer;
-			m_buffer = new unsigned char[rhs.m_capacity];
+			m_buffer = new uint8_t[rhs.m_capacity];
 			m_capacity = rhs.m_capacity;
 			m_pos = rhs.m_pos;
 			memcpy(m_buffer, rhs.m_buffer, m_capacity);
@@ -35,14 +64,15 @@ public:
 		return *this;
 	}
 
-	SerializeBuffer(SerializeBuffer &&rhs) : m_buffer(rhs.m_buffer), m_capacity(rhs.m_capacity), m_pos(rhs.m_pos)
+	SerializeBuffer(SerializeBuffer&& rhs) noexcept
+		: m_buffer(rhs.m_buffer), m_capacity(rhs.m_capacity), m_pos(rhs.m_pos)
 	{
 		rhs.m_buffer = nullptr;
 		rhs.m_capacity = 0;
 		rhs.m_pos = 0;
 	}
 
-	SerializeBuffer &operator=(SerializeBuffer &&rhs)
+	SerializeBuffer& operator=(SerializeBuffer&& rhs) noexcept
 	{
 		if (this != &rhs) {
 			delete[] m_buffer;
@@ -60,140 +90,150 @@ public:
 
 	~SerializeBuffer() { delete[] m_buffer; }
 
-	void WriteUInt8(uint8_t v)
+	// Write a single pod data type
+	template <typename T>
+	std::enable_if_t<std::is_pod_v<T> && !detail::has_serialize<T, void(SerializeBuffer&)>::value, void>
+		Write(T value)
 	{
-		if (m_pos + sizeof(uint8_t) > m_capacity)
-			Grow(m_capacity + sizeof(uint8_t));
-		*(uint8_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(uint8_t);
+		EnsureCapacity(sizeof(T));
+
+		*(T*)(m_buffer + m_pos) = value;
+		m_pos += sizeof(T);
 	}
 
-	void WriteUInt16(uint16_t v)
+	// Write overload enabled for objects that have a Serialize function
+	// Function should have the form: void Serialize(SerializeBuffer&) const;
+	template <typename T>
+	std::enable_if_t<detail::has_serialize<T, void(SerializeBuffer&)>::value, void> Write(const T& obj)
 	{
-		if (m_pos + sizeof(uint16_t) > m_capacity)
-			Grow(m_capacity + sizeof(uint16_t));
-		*(uint16_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(uint16_t);
+		obj.Serialize(*this);
 	}
 
-	void WriteUInt32(uint32_t v)
+	void WriteUInt8(uint8_t value) { Write(value); }
+	void WriteUInt16(uint16_t value) { Write(value); }
+	void WriteUInt32(uint32_t value) { Write(value); }
+	void WriteUInt64(uint64_t value) { Write(value); }
+	void WriteInt8(int8_t value) { Write(value); }
+	void WriteInt16(int16_t value) { Write(value); }
+	void WriteInt32(int32_t value) { Write(value); }
+	void WriteInt64(int64_t value) { Write(value); }
+	void WriteFloat(float value) { Write(value); }
+	void WriteDouble(double value) { Write(value); }
+	void WriteBool(bool value) { Write(value); }
+	void WriteByte(uint8_t value) { Write(value); }
+
+	// Write array of pod values
+	template <typename T>
+	std::enable_if_t<std::is_pod_v<T> && !detail::has_serialize<T, void(SerializeBuffer&)>::value, void>
+		WriteArray(const T* array, size_t elements)
 	{
-		if (m_pos + sizeof(uint32_t) > m_capacity)
-			Grow(m_capacity + sizeof(uint32_t));
-		*(uint32_t *)(m_buffer + m_pos) = v;
+		size_t size = sizeof(T) * elements;
+		EnsureCapacity(size + sizeof(uint32_t));
+
+		// Write length
+		*(uint32_t*)(m_buffer + m_pos) = (uint32_t)elements;
 		m_pos += sizeof(uint32_t);
+
+		memcpy(m_buffer + m_pos, array, size);
+		m_pos += size;
 	}
 
-	void WriteUInt64(uint64_t v)
+	// Write array of objects that have a Serialize function
+	template <typename T>
+	std::enable_if_t<detail::has_serialize<T, void(SerializeBuffer&)>::value, void>
+		WriteArray(const T* array, size_t elements)
 	{
-		if (m_pos + sizeof(uint64_t) > m_capacity)
-			Grow(m_capacity + sizeof(uint64_t));
-		*(uint64_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(uint64_t);
-	}
+		size_t size = (sizeof(T) * elements) + sizeof(uint32_t);
+		EnsureCapacity(size);
 
-	void WriteInt8(int8_t v)
-	{
-		if (m_pos + sizeof(int8_t) > m_capacity)
-			Grow(m_capacity + sizeof(int8_t));
-		*(int8_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(int8_t);
-	}
-
-	void WriteInt16(int16_t v)
-	{
-		if (m_pos + sizeof(int16_t) > m_capacity)
-			Grow(m_capacity + sizeof(int16_t));
-		*(int16_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(int16_t);
-	}
-
-	void WriteInt32(int32_t v)
-	{
-		if (m_pos + sizeof(int32_t) > m_capacity)
-			Grow(m_capacity + sizeof(int32_t));
-		*(int32_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(int32_t);
-	}
-
-	void WriteInt64(int64_t v)
-	{
-		if (m_pos + sizeof(int64_t) > m_capacity)
-			Grow(m_capacity + sizeof(int64_t));
-		*(int64_t *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(int64_t);
-	}
-
-	void WriteFloat(float v)
-	{
-		if (m_pos + sizeof(float) > m_capacity)
-			Grow(m_capacity + sizeof(float));
-		*(float *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(float);
-	}
-
-	void WriteDouble(double v)
-	{
-		if (m_pos + sizeof(double) > m_capacity)
-			Grow(m_capacity + sizeof(double));
-		*(double *)(m_buffer + m_pos) = v;
-		m_pos += sizeof(double);
-	}
-
-	void WriteString(const char *str)
-	{
-		assert(str != nullptr);
-		auto len = std::char_traits<char>::length(str) + 1;
-		if (m_pos + len > m_capacity)
-			Grow(m_capacity + len);
-		memcpy(m_buffer + m_pos, str, len);
-		m_pos += len;
-	}
-
-	void WriteString(const std::string &str)
-	{
-		auto len = str.length() + 1;
-		if (m_pos + len > m_capacity)
-			Grow(m_capacity + len);
-		memcpy(m_buffer + m_pos, str.c_str(), len);
-		m_pos += len;
-	}
-
-	void WriteLengthString(uint32_t len, const char *str)
-	{
-		assert(str != nullptr);
-		if (m_pos + len + sizeof(uint32_t) > m_capacity)
-			Grow(m_capacity + len + sizeof(uint32_t));
-		*(uint32_t *)(m_buffer + m_pos) = len;
+		// Write length
+		*(uint32_t*)(m_buffer + m_pos) = (uint32_t)elements;
 		m_pos += sizeof(uint32_t);
-		memcpy(m_buffer + m_pos, str, len);
+
+		// Write length
+		for (size_t i = 0; i < elements; ++i)
+		{
+			Write(array[i]);
+		}
+	}
+
+	// Write out an array of bytes directly into the buffer.
+	void WriteBytes(const uint8_t* data, size_t length)
+	{
+		EnsureCapacity(length);
+
+		memcpy(m_buffer + m_pos, data, length);
+		m_pos += length;
+	}
+
+	// Write out a null-terminated string into the buffer
+	void WriteString(std::string_view str)
+	{
+		EnsureCapacity(str.length() + 1);
+
+		// Write bytes
+		memcpy(m_buffer + m_pos, str.data(), str.length());
+		m_pos += str.length();
+
+		// Write terminator
+		m_buffer[m_pos++] = 0;
+	}
+
+	// Write a length-prefixed string into the buffer
+	void WriteLengthString(std::string_view str)
+	{
+		WriteLengthString(str.length(), str.data());
+	}
+
+	// Write a length-prefixed string into the buffer
+	void WriteLengthString(size_t len, const char* data)
+	{
+		EnsureCapacity(len + sizeof(uint32_t));
+
+		// Write length
+		*(uint32_t *)(m_buffer + m_pos) = (uint32_t)len;
+		m_pos += sizeof(uint32_t);
+
+		// Write bytes
+		memcpy(m_buffer + m_pos, data, len);
 		m_pos += len;
 	}
 
-	void WriteLengthString(const std::string &str)
+	// Serialize another SerializeBuffer into this one.
+	void Serialize(SerializeBuffer& other) const
 	{
-		uint32_t len = str.length();
-		if (m_pos + len + sizeof(uint32_t) > m_capacity)
-			Grow(m_capacity + len + sizeof(uint32_t));
-		*(uint32_t *)(m_buffer + m_pos) = len;
-		m_pos += sizeof(uint32_t);
-		memcpy(m_buffer + m_pos, str.c_str(), len);
-		m_pos += len;
+		assert(&other != this);
+
+		other.WriteBytes(buffer(), length());
 	}
+
+	void Reset();
 
 	size_t size() const { return m_pos; }
 	size_t length() const { return size(); }
 	size_t capacity() const { return m_capacity; }
-	const unsigned char *buffer() const { return m_buffer; }
+	const uint8_t* buffer() const { return m_buffer; }
 
 	friend class BasePacket;
 
 private:
+	void EnsureCapacity(size_t amount)
+	{
+		if (m_pos + amount > m_capacity)
+			Grow(m_capacity + amount);
+	}
+
 	void Grow(size_t new_size);
-	void Reset();
-	unsigned char *m_buffer;
-	size_t m_capacity;
-	size_t m_pos;
+
+	uint8_t* m_buffer = nullptr;
+	size_t m_capacity = 0;
+	size_t m_pos = 0;
 };
 
-#endif /* !SERIALIZE_BUFFER_H */
+inline bool operator==(const SerializeBuffer& lhs, const SerializeBuffer& rhs) {
+	if (lhs.size() != rhs.size()) {
+		return false;
+	}
+
+	return memcmp(lhs.buffer(), rhs.buffer(), lhs.size()) == 0;
+}
