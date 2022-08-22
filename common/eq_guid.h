@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 class SerializeBuffer;
 
@@ -22,7 +23,10 @@ union EqGuid
 	};
 
 	EqGuid() : guid(0) {}
-	EqGuid(uint16_t worldId, uint32_t entityId) : worldId(worldId), entityId(entityId) {}
+	EqGuid(uint16_t worldId_, uint32_t entityId_) : EqGuid() {
+        worldId = worldId_;
+        entityId = entityId_;
+    }
 
 	void Serialize(SerializeBuffer& buffer) const;
 
@@ -38,14 +42,14 @@ class EqItemGuid
 public:
 	enum { GUID_LENGTH = 18 };
 
-	EqItemGuid();
-	EqItemGuid(EqGuid playerGuid, uint32_t itemId);
-	EqItemGuid(std::string_view encodedString);
+	EqItemGuid() noexcept;
+	EqItemGuid(EqGuid playerGuid, uint32_t itemId) noexcept;
+	EqItemGuid(std::string_view encodedString) noexcept;
 
-	EqItemGuid(const EqItemGuid& other);
+	EqItemGuid(const EqItemGuid& other) noexcept;
 	EqItemGuid(EqItemGuid&& other) noexcept;
 
-	EqItemGuid& operator=(const EqItemGuid& other);
+	EqItemGuid& operator=(const EqItemGuid& other) noexcept;
 	EqItemGuid& operator=(EqItemGuid&& other) noexcept;
 
 	void Clear();
@@ -56,13 +60,13 @@ public:
 	void Set(std::string_view sv);
 
 	// Get raw pointer to 18-byte string
-	const char* GetEncodedString() const { return m_data.c_str(); }
+	const char* GetEncodedString() const { return m_data; }
 
 	// Serialize as null-terminated string (17-bytes)
 	void Serialize(SerializeBuffer& buffer) const;
 
 private:
-	std::string m_data;
+	char m_data[GUID_LENGTH];
 };
 
 inline bool operator==(const EqItemGuid& lhs, const EqItemGuid& rhs) {
