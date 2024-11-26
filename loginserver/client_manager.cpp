@@ -165,9 +165,9 @@ ClientManager::ClientManager()
 	std::string laurion_opcodes_file = server.config.GetVariableString("client_configuration", "laurion_opcodes", "login_opcodes_laurion.conf");
 	std::string laurion_opcodes_path = (std::filesystem::path(path.GetOpcodePath()) / laurion_opcodes_file).string();
 
-	CheckLarionOpcodeFile(titanium_opcodes_path);
+	CheckLarionOpcodeFile(laurion_opcodes_path);
 
-	if (!laurion_ops->LoadOpcodes(titanium_opcodes_path.c_str())) {
+	if (!laurion_ops->LoadOpcodes(laurion_opcodes_path.c_str())) {
 		LogError(
 			"ClientManager fatal error: couldn't load opcodes for Laurion file [{0}]",
 			laurion_opcodes_file
