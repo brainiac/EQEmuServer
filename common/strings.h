@@ -111,9 +111,9 @@ public:
 	static std::string ConvertToDigit(int n, const std::string& suffix);
 	static std::string Escape(const std::string &s);
 	static std::string GetBetween(const std::string &s, std::string start_delim, std::string stop_delim);
-	static std::string Implode(const std::string& glue, std::vector<std::string> src);
 	static std::string Join(const std::vector<std::string> &ar, const std::string &delim);
 	static std::string Join(const std::vector<uint32_t> &ar, const std::string &delim);
+	static std::string Implode(const std::string& glue, const std::vector<std::string>& src) { return Join(src, glue); }
 	static std::string MillisecondsToTime(int duration);
 	static std::string Money(uint64 platinum, uint64 gold = 0, uint64 silver = 0, uint64 copper = 0);
 	static std::string NumberToWords(unsigned long long int n);
@@ -121,8 +121,8 @@ public:
 	static std::string Replace(std::string subject, const std::string &search, const std::string &replace);
 	static std::string SecondsToTime(int duration, bool is_milliseconds = false);
 	static std::string::size_type SearchDelim(const std::string &haystack, const std::string &needle, const char deliminator = ',');
-	static std::vector<std::string> Split(const std::string &s, const char delim = ',');
-	static std::vector<std::string> Split(const std::string& s, const std::string& delimiter);
+	static std::vector<std::string> Split(const std::string& s, char delim = ',', bool skipEmpty = false);
+	static std::vector<std::string> Split(const std::string& s, const std::string& delimiter, bool skipEmpty = false);
 	static std::vector<std::string> Wrap(std::vector<std::string> &src, const std::string& character);
 	static void FindReplace(std::string &string_subject, const std::string &search_string, const std::string &replace_string);
 	static uint32 TimeToSeconds(std::string time_string);

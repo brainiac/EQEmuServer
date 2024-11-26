@@ -68,13 +68,15 @@ std::string Strings::Random(size_t length)
 	return s;
 }
 
-std::vector<std::string> Strings::Split(const std::string &str, const char delim)
+std::vector<std::string> Strings::Split(const std::string& str, const char delim, bool skipEmpty)
 {
 	std::vector<std::string> ret;
 	std::string::size_type   start = 0;
-	auto                     end   = str.find(delim);
+	auto                     end = str.find(delim);
 	while (end != std::string::npos) {
-		ret.emplace_back(str, start, end - start);
+		if (!skipEmpty || (end - start > 0)) {
+			ret.emplace_back(str, start, end - start);
+		}
 		start = end + 1;
 		end   = str.find(delim, start);
 	}
@@ -86,19 +88,23 @@ std::vector<std::string> Strings::Split(const std::string &str, const char delim
 }
 
 // this one takes delimiter length into consideration
-std::vector<std::string> Strings::Split(const std::string &s, const std::string &delimiter)
+std::vector<std::string> Strings::Split(const std::string& s, const std::string& delimiter, bool skipEmpty)
 {
 	size_t                   pos_start = 0, pos_end, delim_len = delimiter.length();
-	std::string              token;
 	std::vector<std::string> res;
 
 	while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-		token     = s.substr(pos_start, pos_end - pos_start);
+		std::string token = s.substr(pos_start, pos_end - pos_start);
 		pos_start = pos_end + delim_len;
-		res.push_back(token);
+		if (!skipEmpty || !token.empty()) {
+			res.push_back(std::move(token));
+		}
 	}
 
-	res.emplace_back(s.substr(pos_start));
+	std::string token = s.substr(pos_start);
+	if (!skipEmpty || !token.empty()) {
+		res.push_back(std::move(token));
+	}
 	return res;
 }
 
@@ -134,26 +140,6 @@ Strings::SearchDelim(const std::string &haystack, const std::string &needle, con
 		pos = haystack.find(needle, pos + needle.length());
 	}
 	return std::string::npos;
-}
-
-
-std::string Strings::Implode(const std::string& glue, std::vector<std::string> src)
-{
-	if (src.empty()) {
-		return {};
-	}
-
-	std::ostringstream                 output;
-	std::vector<std::string>::iterator src_iter;
-
-	for (src_iter = src.begin(); src_iter != src.end(); src_iter++) {
-		output << *src_iter << glue;
-	}
-
-	std::string final_output = output.str();
-	final_output.resize(output.str().size() - glue.size());
-
-	return final_output;
 }
 
 std::vector<std::string> wrap(std::vector<std::string> &src, std::string character)
@@ -232,36 +218,23 @@ bool Strings::IsFloat(const std::string &s)
 	return (*ptr) == '\0';
 }
 
-std::string Strings::Join(const std::vector<std::string> &ar, const std::string &delim)
+std::string Strings::Join(const std::vector<std::string>& ar, const std::string& delim)
 {
-	std::string ret;
-	for (size_t i = 0; i < ar.size(); ++i) {
-		if (i != 0) {
-			ret += delim;
-		}
-
-		ret += ar[i];
+	if (ar.empty()) {
+		return {};
 	}
-
-	return ret;
+	return fmt::format("{}", fmt::join(ar, delim));
 }
 
-std::string Strings::Join(const std::vector<uint32_t> &ar, const std::string &delim)
+std::string Strings::Join(const std::vector<uint32_t>& ar, const std::string& delim)
 {
-	std::string ret;
-	for (size_t i = 0; i < ar.size(); ++i) {
-		if (i != 0) {
-			ret += delim;
-		}
-
-		ret += std::to_string(ar[i]);
+	if (ar.empty()) {
+		return {};
 	}
-
-	return ret;
+	return fmt::format("{}", fmt::join(ar, delim));
 }
 
-void
-Strings::FindReplace(std::string &string_subject, const std::string &search_string, const std::string &replace_string)
+void Strings::FindReplace(std::string &string_subject, const std::string &search_string, const std::string &replace_string)
 {
 	if (string_subject.find(search_string) == std::string::npos) {
 		return;

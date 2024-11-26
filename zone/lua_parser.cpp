@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <filesystem>
 
 #include "../common/spdat.h"
 #include "masterentity.h"
@@ -1057,36 +1058,52 @@ void LuaParser::ReloadQuests() {
 #endif
 
 #ifdef _WINDOWS
-	const char libext[] = ".dll";
+	const char lib_search[] = "?.dll";
 #else
 	// lua doesn't care OSX doesn't use sonames
-	const char libext[] = ".so";
+	const char lib_search[] = "?.so";
 #endif
+	namespace fs = std::filesystem;
+	std::error_code ec;
+	std::filesystem::path lua_modules_path{ path.GetLuaModulesPath() };
 
-	lua_getglobal(L, "package");
-	lua_getfield(L, -1, "path");
-	std::string module_path = lua_tostring(L,-1);
-	module_path += ";" + path.GetLuaModulesPath() + "/?.lua;" + path.GetLuaModulesPath() + "/?/init.lua";
-	// luarock paths using lua_modules as tree
-	// to path it adds foo/share/lua/5.1/?.lua and foo/share/lua/5.1/?/init.lua
-	module_path += ";" + path.GetLuaModulesPath() + "/share/lua/" + lua_version + "/?.lua";
-	module_path += ";" + path.GetLuaModulesPath() + "/share/lua/" + lua_version + "/?/init.lua";
-	lua_pop(L, 1);
-	lua_pushstring(L, module_path.c_str());
-	lua_setfield(L, -2, "path");
-	lua_pop(L, 1);
+	if (fs::is_directory(lua_modules_path))
+	{
+		// update package.path
+		lua_getglobal(L, "package");
+		lua_getfield(L, -1, "path");
+		std::string module_path = lua_tostring(L, -1);
 
-	lua_getglobal(L, "package");
-	lua_getfield(L, -1, "cpath");
-	module_path = lua_tostring(L, -1);
-	module_path += ";" + path.GetLuaModulesPath() + "/?" + libext;
-	// luarock paths using lua_modules as tree
-	// luarocks adds foo/lib/lua/5.1/?.so for cpath
-	module_path += ";" + path.GetLuaModulesPath() + "/lib/lua/" + lua_version + "/?" + libext;
-	lua_pop(L, 1);
-	lua_pushstring(L, module_path.c_str());
-	lua_setfield(L, -2, "cpath");
-	lua_pop(L, 1);
+		std::vector<std::string> module_paths = Strings::Split(module_path, ';', true);
+		module_paths.push_back((lua_modules_path / "?.lua").string());
+		module_paths.push_back((lua_modules_path / "?" / "init.lua").string());
+		// luarock paths using lua_modules as tree
+		// to path it adds foo/share/lua/5.1/?.lua and foo/share/lua/5.1/?/init.lua
+		module_paths.push_back((lua_modules_path / "share" / "lua" / lua_version / "?.lua").string());
+		module_paths.push_back((lua_modules_path / "share" / "lua" / lua_version / "?" / "init.lua").string());
+
+		module_path = Strings::Join(module_paths, ";");
+		lua_pop(L, 1);
+		lua_pushstring(L, module_path.c_str());
+		lua_setfield(L, -2, "path");
+		lua_pop(L, 1);
+
+		// update package.cpath
+		lua_getglobal(L, "package");
+		lua_getfield(L, -1, "cpath");
+		module_path = lua_tostring(L, -1);
+	
+		module_paths = Strings::Split(module_path, ';', true);
+		module_paths.push_back((lua_modules_path / lib_search).string());
+		// luarock paths using lua_modules as tree
+		// luarocks adds foo/lib/lua/5.1/?.so for cpath
+		module_paths.push_back((lua_modules_path / "lib" / "lua" / lua_version / lib_search).string());
+		module_path = Strings::Join(module_paths, ";");
+		lua_pop(L, 1);
+		lua_pushstring(L, module_path.c_str());
+		lua_setfield(L, -2, "cpath");
+		lua_pop(L, 1);
+	}
 
 	MapFunctions(L);
 
