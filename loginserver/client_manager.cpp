@@ -83,6 +83,7 @@ void CheckLarionOpcodeFile(const std::string& path) {
 
 ClientManager::ClientManager()
 {
+	// Titanium+ Login client: login_opcodes.conf, port 5998
 	int titanium_port = server.config.GetVariableInt("client_configuration", "titanium_port", 5998);
 
 	EQStreamManagerInterfaceOptions titanium_opts(titanium_port, false, false);
@@ -90,18 +91,15 @@ ClientManager::ClientManager()
 	titanium_stream = new EQ::Net::EQStreamManager(titanium_opts);
 	titanium_ops    = new RegularOpcodeManager;
 
-	std::string opcodes_path = fmt::format(
-		"{}/{}",
-		path.GetOpcodePath(),
-		"login_opcodes.conf"
-	);
+	std::string titanium_opcodes_file = server.config.GetVariableString("client_configuration", "titanium_opcodes", "login_opcodes.conf");
+	std::string titanium_opcodes_path = (std::filesystem::path(path.GetOpcodePath()) / titanium_opcodes_file).string();
 
-	CheckTitaniumOpcodeFile(opcodes_path);
+	CheckTitaniumOpcodeFile(titanium_opcodes_path);
 
-	if (!titanium_ops->LoadOpcodes(opcodes_path.c_str())) {
+	if (!titanium_ops->LoadOpcodes(titanium_opcodes_path.c_str())) {
 		LogError(
 			"ClientManager fatal error: couldn't load opcodes for Titanium file [{0}]",
-			server.config.GetVariableString("client_configuration", "titanium_opcodes", "login_opcodes.conf")
+			titanium_opcodes_file
 		);
 
 		run_server = false;
@@ -121,24 +119,22 @@ ClientManager::ClientManager()
 		}
 	);
 
+	// SOD+ Login Client: login_opcodes_sod.conf, port 5999
 	int sod_port = server.config.GetVariableInt("client_configuration", "sod_port", 5999);
 
 	EQStreamManagerInterfaceOptions sod_opts(sod_port, false, false);
 	sod_stream = new EQ::Net::EQStreamManager(sod_opts);
 	sod_ops    = new RegularOpcodeManager;
 
-	opcodes_path = fmt::format(
-		"{}/{}",
-		path.GetOpcodePath(),
-		"login_opcodes_sod.conf"
-	);
+	std::string sod_opcodes_file = server.config.GetVariableString("client_configuration", "sod_opcodes", "login_opcodes_sod.conf");
+	std::string sod_opcodes_path = (std::filesystem::path(path.GetOpcodePath()) / sod_opcodes_file).string();
 
-	CheckSoDOpcodeFile(opcodes_path);
+	CheckSoDOpcodeFile(sod_opcodes_path);
 
-	if (!sod_ops->LoadOpcodes(opcodes_path.c_str())) {
+	if (!sod_ops->LoadOpcodes(sod_opcodes_path.c_str())) {
 		LogError(
 			"ClientManager fatal error: couldn't load opcodes for SoD file {0}",
-			server.config.GetVariableString("client_configuration", "sod_opcodes", "login_opcodes.conf").c_str()
+			sod_opcodes_file
 		);
 
 		run_server = false;
@@ -158,39 +154,37 @@ ClientManager::ClientManager()
 		}
 	);
 
-	int larion_port = server.config.GetVariableInt("client_configuration", "larion_port", 15900);
+	// Laurion's Inn client: login_opcodes_laurion.conf, port 15900
+	int laurion_port = server.config.GetVariableInt("client_configuration", "laurion_port", 15900);
 
-	EQStreamManagerInterfaceOptions larion_opts(larion_port, false, false);
+	EQStreamManagerInterfaceOptions laurion_opts(laurion_port, false, false);
 
-	larion_stream = new EQ::Net::EQStreamManager(larion_opts);
-	larion_ops = new RegularOpcodeManager;
+	laurion_stream = new EQ::Net::EQStreamManager(laurion_opts);
+	laurion_ops = new RegularOpcodeManager;
 
-	opcodes_path = fmt::format(
-		"{}/{}",
-		path.GetOpcodePath(),
-		"login_opcodes_larion.conf"
-	);
+	std::string laurion_opcodes_file = server.config.GetVariableString("client_configuration", "laurion_opcodes", "login_opcodes_laurion.conf");
+	std::string laurion_opcodes_path = (std::filesystem::path(path.GetOpcodePath()) / laurion_opcodes_file).string();
 
-	CheckLarionOpcodeFile(opcodes_path);
+	CheckLarionOpcodeFile(titanium_opcodes_path);
 
-	if (!larion_ops->LoadOpcodes(opcodes_path.c_str())) {
+	if (!laurion_ops->LoadOpcodes(titanium_opcodes_path.c_str())) {
 		LogError(
-			"ClientManager fatal error: couldn't load opcodes for Larion file [{0}]",
-			server.config.GetVariableString("client_configuration", "larion_opcodes", "login_opcodes.conf")
+			"ClientManager fatal error: couldn't load opcodes for Laurion file [{0}]",
+			laurion_opcodes_file
 		);
 
 		run_server = false;
 	}
 
-	larion_stream->OnNewConnection(
+	laurion_stream->OnNewConnection(
 		[this](std::shared_ptr<EQ::Net::EQStream> stream) {
 			LogInfo(
-				"New Larion client connection from [{0}:{1}]",
+				"New Laurion client connection from [{0}:{1}]",
 				long2ip(stream->GetRemoteIP()),
 				stream->GetRemotePort()
 			);
 
-			stream->SetOpcodeManager(&larion_ops);
+			stream->SetOpcodeManager(&laurion_ops);
 			Client* c = new Client(stream, cv_larion);
 			clients.push_back(c);
 		}
