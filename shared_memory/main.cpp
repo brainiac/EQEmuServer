@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 		->LoadLogDatabaseSettings()
 		->StartFileLogs();
 
-	std::string shared_mem_directory = Config->SharedMemDir;
+	std::string shared_mem_directory = path.GetSharedMemoryPath();
 	if (MakeDirectory(shared_mem_directory)) {
 		LogInfo("Shared Memory folder doesn't exist, so we created it [{}]", shared_mem_directory.c_str());
 	}

@@ -19,6 +19,7 @@
 #include <iostream>
 #include <cstring>
 #include <fmt/format.h>
+#include <filesystem>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1800
 	#include <algorithm>
@@ -48,6 +49,8 @@
 #include "repositories/skill_caps_repository.h"
 #include "repositories/inventory_repository.h"
 #include "repositories/books_repository.h"
+
+namespace fs = std::filesystem;
 
 namespace ItemField
 {
@@ -1003,12 +1006,13 @@ bool SharedDatabase::LoadItems(const std::string &prefix) {
 	items_mmf.reset(nullptr);
 
 	try {
-		const auto Config = EQEmuConfig::get();
 		EQ::IPCMutex mutex("items");
 		mutex.Lock();
-		std::string file_name = fmt::format("{}/{}{}", path.GetSharedMemoryPath(), prefix, std::string("items"));
+
+		std::string file_name = (fs::path(path.GetSharedMemoryPath()) / (prefix + "items")).string();
 		items_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name, "Items");
 		items_hash = std::make_unique<EQ::FixedMemoryHashSet<EQ::ItemData>>(static_cast<uint8*>(items_mmf->Get()), items_mmf->Size());
+
 		mutex.Unlock();
 
 		LogInfo("Loaded [{}] items via shared memory", Strings::Commify(m_shared_items_count));
@@ -1697,11 +1701,13 @@ bool SharedDatabase::LoadSpells(const std::string &prefix, int32 *records, const
 		EQ::IPCMutex mutex("spells");
 		mutex.Lock();
 
-		std::string file_name = fmt::format("{}/{}{}", path.GetSharedMemoryPath(), prefix, std::string("spells"));
+		std::string file_name = (fs::path(path.GetSharedMemoryPath()) / (prefix + "spells")).string();
 		spells_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name, "Spells");
 		LogInfo("Loading [{}]", file_name);
+
 		*records = *static_cast<uint32*>(spells_mmf->Get());
 		*sp = reinterpret_cast<const SPDat_Spell_Struct*>(static_cast<char*>(spells_mmf->Get()) + 4);
+
 		mutex.Unlock();
 
 		LogInfo("Loaded [{}] spells via shared memory", Strings::Commify(m_shared_spells_count));

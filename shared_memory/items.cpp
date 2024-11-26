@@ -24,6 +24,10 @@
 #include "../common/eqemu_exception.h"
 #include "../common/item_data.h"
 
+#include <filesystem>
+namespace fs = std::filesystem;
+
+
 void LoadItems(SharedDatabase *database, const std::string &prefix) {
 	EQ::IPCMutex mutex("items");
 	mutex.Lock();
@@ -37,8 +41,7 @@ void LoadItems(SharedDatabase *database, const std::string &prefix) {
 
 	uint32 size = static_cast<uint32>(EQ::FixedMemoryHashSet<EQ::ItemData>::estimated_size(items, max_item));
 
-	auto Config = EQEmuConfig::get();
-	std::string file_name = Config->SharedMemDir + prefix + std::string("items");
+	std::string file_name = (fs::path(path.GetSharedMemoryPath()) / (prefix + "items")).string();
 	EQ::MemoryMappedFile mmf(file_name, size, "Items");
 	mmf.ZeroFile();
 
