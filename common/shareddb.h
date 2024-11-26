@@ -186,13 +186,8 @@ public:
 
 protected:
 
-	std::unique_ptr<EQ::MemoryMappedFile>                        skill_caps_mmf;
 	std::unique_ptr<EQ::MemoryMappedFile>                        items_mmf;
 	std::unique_ptr<EQ::FixedMemoryHashSet<EQ::ItemData>>        items_hash;
-	std::unique_ptr<EQ::MemoryMappedFile>                        faction_mmf;
-	std::unique_ptr<EQ::FixedMemoryHashSet<NPCFactionList>>      faction_hash;
-	std::unique_ptr<EQ::MemoryMappedFile>                        faction_associations_mmf;
-	std::unique_ptr<EQ::FixedMemoryHashSet<FactionAssociations>> faction_associations_hash;
 	std::unique_ptr<EQ::MemoryMappedFile>                        spells_mmf;
 
 public:

@@ -45,14 +45,14 @@ namespace EQ {
 		\param filename Actual filename of the mmf.
 		\param size Size in bytes of the mmf.
 		*/
-		MemoryMappedFile(std::string filename, uint32 size);
+		MemoryMappedFile(const std::string& filename, uint32 size, const std::string& objectName);
 
 		//! Constructor
 		/*!
 			Creates a mmf for the given filename and gets the size based on the existing size.
 		\param filename Actual filename of the mmf.
 		*/
-		MemoryMappedFile(std::string filename);
+		MemoryMappedFile(const std::string& filename, const std::string& objectName);
 
 		//! Destructor
 		~MemoryMappedFile();

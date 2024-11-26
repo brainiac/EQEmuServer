@@ -46,7 +46,7 @@ namespace EQ {
 #endif
 	};
 
-	MemoryMappedFile::MemoryMappedFile(std::string filename, uint32 size)
+	MemoryMappedFile::MemoryMappedFile(const std::string& filename, uint32 size, const std::string& objectName)
 		: filename_(filename), size_(size) {
 		imp_ = new Implementation;
 
@@ -64,12 +64,14 @@ namespace EQ {
 			EQ_EXCEPT("Shared Memory", "Could not open a file for this shared memory segment.");
 		}
 
-		imp_->mapped_object_ = CreateFileMapping(file,
+		std::string mappingName = fmt::format("Local\\EQEmu_{}", objectName);
+
+		imp_->mapped_object_ = CreateFileMappingA(file,
 			nullptr,
 			PAGE_READWRITE,
 			0,
 			total_size,
-			filename.c_str());
+			mappingName.c_str());
 
 		if(!imp_->mapped_object_) {
 			EQ_EXCEPT("Shared Memory", "Could not create a file mapping for this shared memory file.");
@@ -105,7 +107,7 @@ namespace EQ {
 #endif
 	}
 
-	MemoryMappedFile::MemoryMappedFile(std::string filename)
+	MemoryMappedFile::MemoryMappedFile(const std::string& filename, const std::string& objectName)
 		: filename_(filename) {
 		imp_ = new Implementation;
 
@@ -133,12 +135,14 @@ namespace EQ {
 			EQ_EXCEPT("Shared Memory", "Could not open a file for this shared memory segment.");
 		}
 
+		std::string mappingName = fmt::format("Local\\EQEmu_{}", objectName);
+
 		imp_->mapped_object_ = CreateFileMapping(file,
 			nullptr,
 			PAGE_READWRITE,
 			0,
 			total_size,
-			filename.c_str());
+			mappingName.c_str());
 
 		if(!imp_->mapped_object_) {
 			EQ_EXCEPT("Shared Memory", "Could not create a file mapping for this shared memory file.");

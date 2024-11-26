@@ -36,7 +36,7 @@ void LoadSpells(SharedDatabase *database, const std::string &prefix) {
 
 	auto Config = EQEmuConfig::get();
 	std::string file_name = Config->SharedMemDir + prefix + std::string("spells");
-	EQ::MemoryMappedFile mmf(file_name, size);
+	EQ::MemoryMappedFile mmf(file_name, size, "Spells");
 	mmf.ZeroFile();
 
 	void *ptr = mmf.Get();

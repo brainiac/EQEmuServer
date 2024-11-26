@@ -1007,7 +1007,7 @@ bool SharedDatabase::LoadItems(const std::string &prefix) {
 		EQ::IPCMutex mutex("items");
 		mutex.Lock();
 		std::string file_name = fmt::format("{}/{}{}", path.GetSharedMemoryPath(), prefix, std::string("items"));
-		items_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name);
+		items_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name, "Items");
 		items_hash = std::make_unique<EQ::FixedMemoryHashSet<EQ::ItemData>>(static_cast<uint8*>(items_mmf->Get()), items_mmf->Size());
 		mutex.Unlock();
 
@@ -1698,7 +1698,7 @@ bool SharedDatabase::LoadSpells(const std::string &prefix, int32 *records, const
 		mutex.Lock();
 
 		std::string file_name = fmt::format("{}/{}{}", path.GetSharedMemoryPath(), prefix, std::string("spells"));
-		spells_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name);
+		spells_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name, "Spells");
 		LogInfo("Loading [{}]", file_name);
 		*records = *static_cast<uint32*>(spells_mmf->Get());
 		*sp = reinterpret_cast<const SPDat_Spell_Struct*>(static_cast<char*>(spells_mmf->Get()) + 4);

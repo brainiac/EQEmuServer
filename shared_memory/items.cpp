@@ -39,7 +39,7 @@ void LoadItems(SharedDatabase *database, const std::string &prefix) {
 
 	auto Config = EQEmuConfig::get();
 	std::string file_name = Config->SharedMemDir + prefix + std::string("items");
-	EQ::MemoryMappedFile mmf(file_name, size);
+	EQ::MemoryMappedFile mmf(file_name, size, "Items");
 	mmf.ZeroFile();
 
 	void *ptr = mmf.Get();
