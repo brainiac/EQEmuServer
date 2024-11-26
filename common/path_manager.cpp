@@ -7,15 +7,6 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-inline std::string striptrailingslash(const std::string &file_path)
-{
-	if (file_path.back() == '/' || file_path.back() == '\\') {
-		return file_path.substr(0, file_path.length() - 1);
-	}
-
-	return file_path;
-}
-
 void PathManager::LoadPaths()
 {
 	m_server_path = File::FindEqemuConfigPath();
@@ -37,56 +28,68 @@ void PathManager::LoadPaths()
 	}
 
 	const auto c = EQEmuConfig::get();
+	fs::path server_path = fs::path{ m_server_path };
+	std::error_code ec;
 
 	// maps
-	if (File::Exists(fs::path{m_server_path + "/" + c->MapDir}.string())) {
-		m_maps_path = fs::relative(fs::path{m_server_path + "/" + c->MapDir}).string();
-	}
-	else if (File::Exists(fs::path{m_server_path + "/maps"}.string())) {
-		m_maps_path = fs::relative(fs::path{m_server_path + "/maps"}).string();
-	}
-	else if (File::Exists(fs::path{m_server_path + "/Maps"}.string())) {
-		m_maps_path = fs::relative(fs::path{m_server_path + "/Maps"}).string();
+	if (fs::path maps_path = server_path / c->MapDir; fs::is_directory(maps_path, ec)) {
+		m_maps_path = fs::relative(maps_path).lexically_normal().string();
+	} else if (maps_path = server_path / "maps"; fs::is_directory(maps_path, ec)) {
+		m_maps_path = "maps";
+	} else {
+		m_maps_path = "Maps";
 	}
 
 	// quests
-	if (File::Exists(fs::path{m_server_path + "/" + c->QuestDir}.string())) {
-		m_quests_path = fs::relative(fs::path{m_server_path + "/" + c->QuestDir}).string();
+	if (fs::path quests_path = server_path / c->QuestDir; fs::is_directory(quests_path, ec)) {
+		m_quests_path = fs::relative(quests_path).lexically_normal().string();
+	} else {
+		m_quests_path = "quests";
 	}
 
 	// plugins
-	if (File::Exists(fs::path{m_server_path + "/" + c->PluginDir}.string())) {
-		m_plugins_path = fs::relative(fs::path{m_server_path + "/" + c->PluginDir}).string();
+	if (fs::path plugins_path = server_path / c->PluginDir; fs::is_directory(plugins_path, ec)) {
+		m_plugins_path = fs::relative(plugins_path).lexically_normal().string();
+	} else {
+		m_plugins_path = "plugins";
 	}
 
 	// lua_modules
-	if (File::Exists(fs::path{m_server_path + "/" + c->LuaModuleDir}.string())) {
-		m_lua_modules_path = fs::relative(fs::path{m_server_path + "/" + c->LuaModuleDir}).string();
+	if (fs::path lua_modules_path = server_path / c->LuaModuleDir; fs::is_directory(lua_modules_path, ec)) {
+		m_lua_modules_path = fs::relative(lua_modules_path).lexically_normal().string();
+	} else {
+		m_lua_modules_path = "lua_modules";
 	}
 
 	// lua mods
-	if (File::Exists(fs::path{ m_server_path + "/mods" }.string())) {
-		m_lua_mods_path = fs::relative(fs::path{ m_server_path + "/mods" }).string();
+	m_lua_mods_path = "mods";
+
+	// patches
+	if (fs::path patch_path = server_path / c->PatchDir; fs::is_directory(patch_path, ec)) {
+		m_patch_path = fs::relative(patch_path).lexically_normal().string();
+	} else {
+		m_patch_path = ".";
 	}
 
 	// patches
-	if (File::Exists(fs::path{m_server_path + "/" + c->PatchDir}.string())) {
-		m_patch_path = fs::relative(fs::path{m_server_path + "/" + c->PatchDir}).string();
-	}
-
-	// patches
-	if (File::Exists(fs::path{ m_server_path + "/" + c->OpcodeDir }.string())) {
-		m_opcode_path = fs::relative(fs::path{ m_server_path + "/" + c->OpcodeDir }).string();
+	if (fs::path opcode_path = server_path / c->OpcodeDir; fs::is_directory(opcode_path, ec)) {
+		m_opcode_path = fs::relative(opcode_path).lexically_normal().string();
+	} else {
+		m_opcode_path = ".";
 	}
 
 	// shared_memory_path
-	if (File::Exists(fs::path{m_server_path + "/" + c->SharedMemDir}.string())) {
-		m_shared_memory_path = fs::relative(fs::path{ m_server_path + "/" + c->SharedMemDir }).string();
+	if (fs::path shared_memory_path = server_path / c->SharedMemDir; fs::is_directory(shared_memory_path, ec)) {
+		m_shared_memory_path = fs::relative(shared_memory_path).lexically_normal().string();
+	} else {
+		m_shared_memory_path = "shared";
 	}
 
 	// logging path
-	if (File::Exists(fs::path{m_server_path + "/" + c->LogDir}.string())) {
-		m_log_path = fs::relative(fs::path{m_server_path + "/" + c->LogDir}).string();
+	if (fs::path log_path = server_path / c->LogDir; fs::is_directory(log_path, ec)) {
+		m_log_path = fs::relative(log_path).lexically_normal().string();
+	} else {
+		m_log_path = "logs";
 	}
 
 	LogInfo("logs path [{}]", m_log_path);
