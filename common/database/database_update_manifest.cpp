@@ -1,6 +1,6 @@
 #include "database_update.h"
 
-std::vector<ManifestEntry> manifest_entries = {
+static inline std::vector<ManifestEntry> manifest_entries = {
 	ManifestEntry{
 		.version = 9000,
 		.description = "2013_02_18_merc_rules_and_tables.sql",

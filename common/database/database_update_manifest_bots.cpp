@@ -1,6 +1,6 @@
 #include "database_update.h"
 
-std::vector<ManifestEntry> bot_manifest_entries = {
+static inline std::vector<ManifestEntry> bot_manifest_entries = {
 	ManifestEntry{
 		.version = 9035,
 		.description = "2022_12_04_bot_archery.sql",
