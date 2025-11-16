@@ -15,15 +15,22 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-ccache
+
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ninja-build libmariadb-dev libmariadb-dev-compat libboost-all-dev libperl-dev liblua5.1-0-dev libluajit-5.1-dev zlib1g-dev uuid-dev libssl-dev libsodium-dev libmbedtls-dev
+          sudo apt-get install -y build-essential ninja-build ccache libmariadb-dev libmariadb-dev-compat libboost-all-dev libperl-dev liblua5.1-0-dev libluajit-5.1-dev zlib1g-dev uuid-dev libssl-dev libsodium-dev libmbedtls-dev
 
       - name: Configure
         run: |
           cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DEQEMU_BUILD_TESTS=ON \
             -DEQEMU_BUILD_STATIC=ON \
             -DEQEMU_BUILD_LOGIN=ON \
@@ -33,6 +40,10 @@ jobs:
 
       - name: Build
         run: cmake --build build --parallel
+
+      - name: Test
+        working-directory: build
+        run: ./bin/tests
 
   windows:
     name: Windows
@@ -51,11 +62,18 @@ jobs:
         with:
           arch: x64
 
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-ccache
+
       - name: Configure
         shell: pwsh
         run: |
           cmake -S . -B build -G "Visual Studio 17 2022" -A x64 `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache `
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
             -DEQEMU_BUILD_TESTS=ON `
             -DEQEMU_BUILD_STATIC=ON `
             -DEQEMU_BUILD_LOGIN=ON `
@@ -67,3 +85,6 @@ jobs:
         shell: pwsh
         run: cmake --build build --config RelWithDebInfo --target ALL_BUILD -- /m
 
+      - name: Test
+        working-directory: build
+        run: ./bin/RelWithDebInfo/tests.exe
