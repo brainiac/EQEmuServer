@@ -7,7 +7,7 @@ on:
 
 jobs:
   linux:
-    name: Linux build
+    name: Linux
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -21,13 +21,21 @@ jobs:
           sudo apt-get install -y build-essential ninja-build libmariadb-dev libmariadb-dev-compat libboost-all-dev libperl-dev liblua5.1-0-dev libluajit-5.1-dev zlib1g-dev uuid-dev libssl-dev libsodium-dev libmbedtls-dev
 
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEQEMU_BUILD_TESTS=OFF -DEQEMU_BUILD_LOGIN=ON -DEQEMU_BUILD_CLIENT_FILES=ON
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DEQEMU_BUILD_TESTS=ON \
+            -DEQEMU_BUILD_STATIC=ON \
+            -DEQEMU_BUILD_LOGIN=ON \
+            -DEQEMU_BUILD_LUA=ON \
+            -DEQEMU_BUILD_PERL=ON \
+            -DEQEMU_BUILD_CLIENT_FILES=ON
 
       - name: Build
         run: cmake --build build --parallel
 
   windows:
-    name: Windows build
+    name: Windows
     runs-on: windows-latest
     steps:
       - name: Checkout source
@@ -45,7 +53,15 @@ jobs:
 
       - name: Configure
         shell: pwsh
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEQEMU_BUILD_TESTS=OFF -DEQEMU_BUILD_LOGIN=ON -DEQEMU_BUILD_CLIENT_FILES=ON
+        run: |
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DEQEMU_BUILD_TESTS=ON `
+            -DEQEMU_BUILD_STATIC=ON `
+            -DEQEMU_BUILD_LOGIN=ON `
+            -DEQEMU_BUILD_LUA=ON `
+            -DEQEMU_BUILD_PERL=ON `
+            -DEQEMU_BUILD_CLIENT_FILES=ON
 
       - name: Build
         shell: pwsh
