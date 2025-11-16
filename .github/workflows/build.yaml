@@ -32,7 +32,6 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DEQEMU_BUILD_TESTS=ON \
-            -DEQEMU_BUILD_STATIC=ON \
             -DEQEMU_BUILD_LOGIN=ON \
             -DEQEMU_BUILD_LUA=ON \
             -DEQEMU_BUILD_PERL=ON \
@@ -75,10 +74,9 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache `
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
             -DEQEMU_BUILD_TESTS=ON `
-            -DEQEMU_BUILD_STATIC=ON `
             -DEQEMU_BUILD_LOGIN=ON `
             -DEQEMU_BUILD_LUA=ON `
-            -DEQEMU_BUILD_PERL=ON `
+            -DEQEMU_BUILD_ZLIB=ON `
             -DEQEMU_BUILD_CLIENT_FILES=ON
 
       - name: Build
