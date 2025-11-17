@@ -61,28 +61,21 @@ jobs:
         with:
           arch: x64
 
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-ccache
-
       - name: Configure
         shell: pwsh
         run: |
-          cmake -S . -B build -G "Ninja" `
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
-            -DCMAKE_C_COMPILER_LAUNCHER=ccache `
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
-            -DBUILD_SHARED_LIBS=OFF `
             -DEQEMU_BUILD_TESTS=ON `
             -DEQEMU_BUILD_LOGIN=ON `
             -DEQEMU_BUILD_LUA=ON `
+            -DEQEMU_BUILD_ZLIB=ON `
             -DEQEMU_BUILD_CLIENT_FILES=ON
 
       - name: Build
         shell: pwsh
-        run: cmake --build build --parallel
+        run: cmake --build build --config RelWithDebInfo --target ALL_BUILD -- /m
 
       - name: Test
         working-directory: build
-        run: .\bin\tests.exe
+        run: ./bin/RelWithDebInfo/tests.exe
