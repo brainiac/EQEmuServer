@@ -73,6 +73,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo `
             -DCMAKE_C_COMPILER_LAUNCHER=ccache `
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
+            -DBUILD_SHARED_LIBS=OFF `
             -DEQEMU_BUILD_TESTS=ON `
             -DEQEMU_BUILD_LOGIN=ON `
             -DEQEMU_BUILD_LUA=ON `
@@ -84,4 +85,4 @@ jobs:
 
       - name: Test
         working-directory: build
-        run: ./bin/RelWithDebInfo/tests.exe
+        run: .\bin\tests.exe
