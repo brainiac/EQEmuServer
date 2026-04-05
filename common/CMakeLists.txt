@@ -79,7 +79,6 @@ set(common_sources
     net/tcp_server.cpp
     net/websocket_server.cpp
     net/websocket_server_connection.cpp
-    opcode_map.cpp
     opcode_manager.cpp
     packet_dump.cpp
     packet_dump_file.cpp
