@@ -72,7 +72,7 @@ typedef void (Client::*ClientPacketProc)(const EQApplicationPacket *app);
 //Use a map for connecting opcodes since it dosent get used a lot and is sparse
 std::map<uint32, ClientPacketProc> ConnectingOpcodes;
 //Use a static array for connected, for speed
-ClientPacketProc ConnectedOpcodes[_maxEmuOpcode];
+ClientPacketProc ConnectedOpcodes[MaxEmuOpcode];
 
 void MapOpcodes()
 {
@@ -426,12 +426,12 @@ void MapOpcodes()
 	ConnectedOpcodes[OP_SharedTaskQuit]           = &Client::Handle_OP_SharedTaskQuit;
 	ConnectedOpcodes[OP_SharedTaskPlayerList]     = &Client::Handle_OP_SharedTaskPlayerList;
 
-	LogInfo("Mapped [{}] client opcode handlers", _maxEmuOpcode);
+	LogInfo("Mapped [{}] client opcode handlers", MaxEmuOpcode);
 }
 
 void ClearMappedOpcode(EmuOpcode op)
 {
-	if (op >= _maxEmuOpcode)
+	if (op >= MaxEmuOpcode)
 		return;
 
 	ConnectedOpcodes[op] = nullptr;

@@ -74,7 +74,7 @@ namespace UF
 			std::string opfile = fmt::format("{}/patch_{}.conf", PathManager::Instance()->GetPatchPath(), name);
 			//load up the opcode manager.
 			//TODO: figure out how to support shared memory with multiple patches...
-			opcodes = new RegularOpcodeManager();
+			opcodes = new OpcodeManager();
 			if (!opcodes->LoadOpcodes(opfile.c_str())) {
 				LogNetcode("[OPCODES] Error loading opcodes file [{}]. Not registering patch [{}]", opfile.c_str(), name);
 				return;

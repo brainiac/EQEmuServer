@@ -114,7 +114,7 @@ Json::Value ApiGetPacketStatistics(EQ::Net::WebsocketServerConnection *connectio
 
 		Json::Value sent_packet_types;
 
-		for (auto i = 0; i < _maxEmuOpcode; ++i) {
+		for (auto i = 0; i < MaxEmuOpcode; ++i) {
 			auto count = eqs_stats.SentCount[i];
 			if (count > 0) {
 				sent_packet_types[OpcodeNames[i]] = count;
@@ -123,7 +123,7 @@ Json::Value ApiGetPacketStatistics(EQ::Net::WebsocketServerConnection *connectio
 
 		Json::Value receive_packet_types;
 
-		for (auto i = 0; i < _maxEmuOpcode; ++i) {
+		for (auto i = 0; i < MaxEmuOpcode; ++i) {
 			auto count = eqs_stats.RecvCount[i];
 			if (count > 0) {
 				receive_packet_types[OpcodeNames[i]] = count;
@@ -146,7 +146,7 @@ Json::Value ApiGetOpcodeList(EQ::Net::WebsocketServerConnection *connection, Jso
 	}
 
 	Json::Value response;
-	for (auto   i = 0; i < _maxEmuOpcode; ++i) {
+	for (auto   i = 0; i < MaxEmuOpcode; ++i) {
 		Json::Value row = OpcodeNames[i];
 
 		response.append(row);

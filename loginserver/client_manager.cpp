@@ -107,7 +107,7 @@ ClientManager::ClientManager()
 	EQStreamManagerInterfaceOptions titanium_opts(titanium_port, false, false);
 
 	m_titanium_stream = new EQ::Net::EQStreamManager(titanium_opts);
-	m_titanium_ops    = new RegularOpcodeManager;
+	m_titanium_ops    = new OpcodeManager();
 
 	std::string opcodes_path = fmt::format(
 		"{}/{}",
@@ -144,7 +144,7 @@ ClientManager::ClientManager()
 
 	EQStreamManagerInterfaceOptions sod_opts(sod_port, false, false);
 	m_sod_stream = new EQ::Net::EQStreamManager(sod_opts);
-	m_sod_ops    = new RegularOpcodeManager;
+	m_sod_ops    = new OpcodeManager();
 
 	opcodes_path = fmt::format(
 		"{}/{}",
@@ -182,7 +182,7 @@ ClientManager::ClientManager()
 	EQStreamManagerInterfaceOptions tob_opts(tob_port, false, false);
 
 	m_tob_stream = new EQ::Net::EQStreamManager(tob_opts);
-	m_tob_ops    = new RegularOpcodeManager;
+	m_tob_ops    = new OpcodeManager();
 
 	opcodes_path = fmt::format(
 		"{}/{}",

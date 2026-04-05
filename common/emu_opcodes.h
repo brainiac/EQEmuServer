@@ -17,12 +17,12 @@
 */
 #pragma once
 
-//this is the highest opcode possibly used in the regular EQ protocol
+#include <cstdint>
+
+// this is the highest opcode possibly used in the regular EQ protocol
 #define MAX_EQ_OPCODE 0xFFFF
 
-
 /*
-
 
 the list of opcodes is in emu_oplist.h
 
@@ -32,17 +32,18 @@ so we know the enum type for the opcode defines must be at least
 
 */
 
-typedef enum { //EQEmu internal opcodes list
-	OP_Unknown=0,
+enum EmuOpcode : uint16_t // EQEmu internal opcodes list
+{
+	OP_Unknown = 0,
 
-//a preprocessor hack so we dont have to maintain two lists
+	// a preprocessor hack so we dont have to maintain two lists
 #define N(x) x
 	#include "emu_oplist.h"
 	#include "mail_oplist.h"
 #undef N
 
-	_maxEmuOpcode
-} EmuOpcode;
+	MaxEmuOpcode
+};
 
 constexpr int format_as(EmuOpcode opcode) { return static_cast<int>(opcode); }
-extern const char *OpcodeNames[_maxEmuOpcode+1];
+extern const char* OpcodeNames[MaxEmuOpcode + 1];

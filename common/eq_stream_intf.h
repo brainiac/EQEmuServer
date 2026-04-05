@@ -99,8 +99,8 @@ public:
 	struct Stats
 	{
 		EQ::Net::ReliableStreamConnectionStats ReliableStreamStats;
-		int RecvCount[_maxEmuOpcode];
-		int SentCount[_maxEmuOpcode];
+		int RecvCount[MaxEmuOpcode];
+		int SentCount[MaxEmuOpcode];
 	};
 
 	virtual void QueuePacket(const EQApplicationPacket *p, bool ack_req=true) = 0;
