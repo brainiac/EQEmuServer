@@ -42,8 +42,20 @@
 
 namespace RoF2
 {
-	static const char *name = "RoF2";
-	static OpcodeManager *opcodes = nullptr;
+	static const char* name = "RoF2";
+	static OpcodeManager* opcodes = nullptr;
+
+	static const OpcodeValueList* GetOpcodeValues()
+	{
+		static OpcodeValueList opcodes = {
+#define OPCODE(name, value) { name, value },
+			#include "rof2_opcodes.h"
+#undef OPCODE
+		};
+
+		return &opcodes;
+	}
+
 	static Strategy struct_strategy;
 
 	void SerializeItem(EQ::OutBuffer& ob, const EQ::ItemInstance *inst, int16 slot_id, uint8 depth, ItemPacketType packet_type);
@@ -71,19 +83,19 @@ namespace RoF2
 
 	static inline int RoF2ToServerBuffSlot(int index);
 
-	void Register(EQStreamIdentifier &into)
+	void Register(EQStreamIdentifier& into)
 	{
-		//create our opcode manager if we havent already
-		if (opcodes == nullptr) {
+		// create our opcode manager if we havent already
+		if (opcodes == nullptr)
+		{
+			opcodes = new OpcodeManager(name, GetOpcodeValues());
 
-			std::string opfile = fmt::format("{}/patch_{}.conf", PathManager::Instance()->GetPatchPath(), name);
+			std::string opcodeFile = PathManager::Instance()->FindFilePath(
+				PathLocation::Patches, fmt::format("patch_{}.conf", name));
 
-			//load up the opcode manager.
-			//TODO: figure out how to support shared memory with multiple patches...
-			opcodes = new OpcodeManager();
-			if (!opcodes->LoadOpcodes(opfile.c_str())) {
-				LogNetcode("[OPCODES] Error loading opcodes file [{}]. Not registering patch [{}]", opfile.c_str(), name);
-				return;
+			if (!opcodes->LoadOpcodes(opcodeFile.c_str()))
+			{
+				LogNetcode("[OPCODES] Error loading opcodes file [{}] for patch [{}]", opcodeFile.c_str(), name);
 			}
 		}
 
@@ -119,7 +131,7 @@ namespace RoF2
 
 		if (opcodes != nullptr) {
 			std::string opfile = fmt::format("{}/patch_{}.conf", PathManager::Instance()->GetPatchPath(), name);
-			if (!opcodes->ReloadOpcodes(opfile.c_str())) {
+			if (!opcodes->LoadOpcodes(opfile.c_str())) {
 				LogNetcode("[OPCODES] Error reloading opcodes file [{}] for patch [{}]", opfile.c_str(), name);
 				return;
 			}

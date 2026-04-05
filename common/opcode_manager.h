@@ -17,20 +17,21 @@
 */
 #pragma once
 
-#include "common/emu_opcodes.h"
 #include "common/types.h"
+#include "common/patches/opcodes.h"
 
 #include <mutex>
 #include <vector>
 
+enum EmuOpcode : uint16_t;
+
 class OpcodeManager
 {
 public:
-	OpcodeManager();
+	OpcodeManager(const char* name, const OpcodeValueList* opcodeValues = nullptr);
 	~OpcodeManager();
 
-	bool LoadOpcodes(const char* filename, bool report_errors = false);
-	bool ReloadOpcodes(const char* filename, bool report_errors = false);
+	bool LoadOpcodes(const std::string& filename, bool report_errors = false);
 
 	uint16 EmuToEQ(EmuOpcode emu_op);
 	EmuOpcode EQToEmu(uint16 eq_op);
@@ -41,11 +42,13 @@ public:
 
 private:
 	bool LoadOpcodesFile(const char* filename, bool report_errors);
-	void Set(EmuOpcode emu_op, uint16 eq_op);
+	bool Set(EmuOpcode emu_op, uint16 eq_op);
 
-	bool m_loaded = false;
 	std::mutex m_mutex;
-
+	const char* m_name;
 	std::vector<uint16_t> m_emuToEQ;
 	std::vector<uint16_t> m_eqToEmu;
+
+	// Compiled in opcode values
+	const OpcodeValueList* m_opcodeValues;
 };

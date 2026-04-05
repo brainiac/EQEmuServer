@@ -651,9 +651,13 @@ set(common_headers
 	opcode_manager.h
 	packet_dump_file.h
 	packet_dump.h
+	patches/client_version.h
 	patches/IBuff.h
 	patches/IMessage.h
-	patches/client_version.h
+	patches/login_sod_opcodes.h
+	patches/login_steam_latest_opcodes.h
+	patches/login_titanium_opcodes.h
+	patches/opcodes.h
 	patches/patches.h
 	patches/rof_limits.h
 	patches/rof_ops.h
