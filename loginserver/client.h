@@ -19,7 +19,6 @@
 
 #include "common/eq_stream_intf.h"
 #include "common/net/reliable_stream_connection.h"
-#include "common/opcodemgr.h"
 #include "common/random.h"
 #include "common/repositories/login_accounts_repository.h"
 #include "loginserver/login_types.h"

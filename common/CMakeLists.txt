@@ -81,7 +81,7 @@ set(common_sources
 	net/websocket_server_connection.cpp
 	net/websocket_server.cpp
 	opcode_map.cpp
-	opcodemgr.cpp
+	opcode_manager.cpp
 	packet_dump_file.cpp
 	packet_dump.cpp
 	packet_functions.cpp
@@ -651,7 +651,7 @@ set(common_headers
 	net/websocket_server.h
 	op_codes.h
 	opcode_dispatch.h
-	opcodemgr.h
+	opcode_manager.h
 	packet_dump_file.h
 	packet_dump.h
 	packet_functions.h

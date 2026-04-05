@@ -19,6 +19,7 @@
 
 #include "common/file.h"
 #include "common/misc.h"
+#include "common/opcode_manager.h"
 #include "common/path_manager.h"
 #include "loginserver/login_server.h"
 

@@ -18,6 +18,7 @@
 #include "eqstream.h"
 
 #include "common/eqemu_logsys.h"
+#include "common/opcode_manager.h"
 
 EQ::Net::EQStreamManager::EQStreamManager(const EQStreamManagerInterfaceOptions &options) : EQStreamManagerInterface(options), m_reliable_stream(options.reliable_stream_options)
 {

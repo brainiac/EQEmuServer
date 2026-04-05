@@ -21,7 +21,7 @@
 #include "common/misc.h"
 #include "common/op_codes.h"
 #ifndef STATIC_OPCODE
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #endif
 #include "common/packet_dump.h"
 #include "common/packet_functions.h"

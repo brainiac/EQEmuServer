@@ -22,7 +22,7 @@
 #include "common/eq_packet_structs.h"
 #include "common/eq_stream_ident.h"
 #include "common/logsys.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 
 namespace TEMPLATE {
 

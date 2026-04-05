@@ -21,7 +21,7 @@
 #include "common/data_verification.h"
 #include "common/eqemu_logsys.h"
 #include "common/events/player_event_logs.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #include "common/raid.h"
 #include "common/rdtsc.h"
 #include "common/repositories/account_repository.h"

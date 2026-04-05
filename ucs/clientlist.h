@@ -18,12 +18,13 @@
 #pragma once
 
 #include "common/net/eqstream.h"
-#include "common/opcodemgr.h"
 #include "common/rulesys.h"
 #include "ucs/chatchannel.h"
 
 #include <list>
 #include <vector>
+
+class OpcodeManager;
 
 #define MAX_JOINED_CHANNELS 10
 

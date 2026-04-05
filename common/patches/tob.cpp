@@ -22,7 +22,7 @@ Copyright (C) 2001-2026 EQEmu Development Team
 #include "common/global_define.h"
 #include "common/eqemu_config.h"
 #include "common/eqemu_logsys.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 
 #include "common/eq_stream_ident.h"
 #include "common/crc32.h"

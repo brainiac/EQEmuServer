@@ -31,7 +31,7 @@
 #include "common/extprofile.h"
 #include "common/inventory_profile.h"
 #include "common/misc.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #include "common/packet_dump.h"
 #include "common/races.h"
 #include "common/random.h"

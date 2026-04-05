@@ -25,7 +25,7 @@
 #include "common/eqemu_logsys.h"
 #include "common/item_instance.h"
 #include "common/misc_functions.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #include "common/path_manager.h"
 #include "common/races.h"
 #include "common/raid.h"
