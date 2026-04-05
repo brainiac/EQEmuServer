@@ -29,7 +29,7 @@
 //so if you specify set_defaults=false
 StructStrategy::StructStrategy() {
 	int r;
-	for(r = 0; r < _maxEmuOpcode; r++) {
+	for(r = 0; r < MaxEmuOpcode; r++) {
 		encoders[r] = PassEncoder;
 		decoders[r] = PassDecoder;
 	}

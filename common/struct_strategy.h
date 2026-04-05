@@ -54,8 +54,8 @@ protected:
 	static void PassEncoder(EQApplicationPacket **p, std::shared_ptr<EQStreamInterface> dest, bool ack_req);
 	static void PassDecoder(EQApplicationPacket *p);
 
-	Encoder encoders[_maxEmuOpcode];
-	Decoder decoders[_maxEmuOpcode];
+	Encoder encoders[MaxEmuOpcode];
+	Decoder decoders[MaxEmuOpcode];
 };
 
 //effectively a singleton, but I decided to do it this way for no apparent reason.

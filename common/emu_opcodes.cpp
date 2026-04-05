@@ -17,10 +17,10 @@
 */
 #include "common/emu_opcodes.h"
 
-const char *OpcodeNames[_maxEmuOpcode+1] = {
+const char* OpcodeNames[MaxEmuOpcode + 1] = {
 	"OP_Unknown",
 
-//a preprocessor hack so we dont have to maintain two lists
+	// a preprocessor hack so we dont have to maintain two lists
 #define N(x) #x
 	#include "emu_oplist.h"
 	#include "mail_oplist.h"
@@ -28,3 +28,4 @@ const char *OpcodeNames[_maxEmuOpcode+1] = {
 
 	""
 };
+

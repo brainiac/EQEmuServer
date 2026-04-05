@@ -263,7 +263,7 @@ void ShowNetworkStats(Client *c, const Seperator *sep)
 
 	std::string sent_rows;
 
-	for (int i = 0; i < _maxEmuOpcode; ++i) {
+	for (int i = 0; i < MaxEmuOpcode; ++i) {
 		const int count = eqs_stats.SentCount[i];
 		if (count) {
 			sent_rows += DialogueWindow::TableRow(
@@ -281,7 +281,7 @@ void ShowNetworkStats(Client *c, const Seperator *sep)
 
 	std::string recv_rows;
 
-	for (int i = 0; i < _maxEmuOpcode; ++i) {
+	for (int i = 0; i < MaxEmuOpcode; ++i) {
 		const int count = eqs_stats.RecvCount[i];
 		if (count) {
 			recv_rows += DialogueWindow::TableRow(

@@ -255,7 +255,7 @@ EQ::Net::EQStream::Stats EQ::Net::EQStream::GetStats() const
 	Stats ret;
 	ret.ReliableStreamStats = m_connection->GetStats();
 
-	for (int i = 0; i < _maxEmuOpcode; ++i) {
+	for (int i = 0; i < MaxEmuOpcode; ++i) {
 		ret.RecvCount[i] = 0;
 		ret.SentCount[i] = 0;
 	}
