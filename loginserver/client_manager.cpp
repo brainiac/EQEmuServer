@@ -20,110 +20,65 @@
 #include "common/file.h"
 #include "common/misc.h"
 #include "common/opcode_manager.h"
+#include "common/patches/opcodes.h"
 #include "common/path_manager.h"
 #include "loginserver/login_server.h"
 
 extern LoginServer server;
 extern bool        run_server;
 
-void CheckTitaniumOpcodeFile(const std::string &path)
+static const OpcodeValueList* GetTitaniumLoginOpcodes()
 {
-	if (File::Exists(path)) {
-		return;
-	}
+	static OpcodeValueList opcodes = {
+#define OPCODE(name, value) { name, value },
+		#include "common/patches/login_titanium_opcodes.h"
+#undef OPCODE
+	};
 
-	auto f = fopen(path.c_str(), "w");
-	if (f) {
-		fprintf(f, "#EQEmu Public Login Server OPCodes\n");
-		fprintf(f, "OP_SessionReady=0x0001\n");
-		fprintf(f, "OP_Login=0x0002\n");
-		fprintf(f, "OP_ServerListRequest=0x0004\n");
-		fprintf(f, "OP_PlayEverquestRequest=0x000d\n");
-		fprintf(f, "OP_PlayEverquestResponse=0x0021\n");
-		fprintf(f, "OP_ChatMessage=0x0016\n");
-		fprintf(f, "OP_LoginAccepted=0x0017\n");
-		fprintf(f, "OP_ServerListResponse=0x0018\n");
-		fprintf(f, "OP_Poll=0x0029\n");
-		fprintf(f, "OP_EnterChat=0x000f\n");
-		fprintf(f, "OP_PollResponse=0x0011\n");
-		fclose(f);
-	}
+	return &opcodes;
 }
 
-void CheckSoDOpcodeFile(const std::string &path)
+static const OpcodeValueList* GetSodLoginOpcodes()
 {
-	if (File::Exists(path)) {
-		return;
-	}
+	static OpcodeValueList opcodes = {
+#define OPCODE(name, value) { name, value },
+		#include "common/patches/login_sod_opcodes.h"
+#undef OPCODE
+	};
 
-	auto f = fopen(path.c_str(), "w");
-	if (f) {
-		fprintf(f, "#EQEmu Public Login Server OPCodes\n");
-		fprintf(f, "OP_SessionReady=0x0001\n");
-		fprintf(f, "OP_Login=0x0002\n");
-		fprintf(f, "OP_ServerListRequest=0x0004\n");
-		fprintf(f, "OP_PlayEverquestRequest=0x000d\n");
-		fprintf(f, "OP_PlayEverquestResponse=0x0022\n");
-		fprintf(f, "OP_ChatMessage=0x0017\n");
-		fprintf(f, "OP_LoginAccepted=0x0018\n");
-		fprintf(f, "OP_ServerListResponse=0x0019\n");
-		fprintf(f, "OP_Poll=0x0029\n");
-		fprintf(f, "OP_LoginExpansionPacketData=0x0031\n");
-		fprintf(f, "OP_EnterChat=0x000f\n");
-		fprintf(f, "OP_PollResponse=0x0011\n");
-		fclose(f);
-	}
+	return &opcodes;
 }
 
-void CheckSteamLatestOpcodeFile(const std::string &path)
+static const OpcodeValueList* GetSteamLatestLoginOpcodes()
 {
-	if (File::Exists(path)) {
-		return;
-	}
+	static OpcodeValueList opcodes = {
+#define OPCODE(name, value) { name, value },
+		#include "common/patches/login_steam_latest_opcodes.h"
+#undef OPCODE
+	};
 
-	auto f = fopen(path.c_str(), "w");
-	if (f) {
-		fprintf(f, "#EQEmu Public Login Server OPCodes\n");
-		fprintf(f, "OP_SessionReady=0x0001\n");
-		fprintf(f, "OP_Login=0x0002\n");
-		fprintf(f, "OP_ServerListRequest=0x0004\n");
-		fprintf(f, "OP_PlayEverquestRequest=0x000d\n");
-		fprintf(f, "OP_PlayEverquestResponse=0x0023\n");
-		fprintf(f, "OP_ChatMessage=0x0018\n");
-		fprintf(f, "OP_LoginAccepted=0x0019\n");
-		fprintf(f, "OP_ServerListResponse=0x001a\n");
-		fprintf(f, "OP_Poll=0x002a\n");
-		fprintf(f, "OP_EnterChat=0x000f\n");
-		fprintf(f, "OP_PollResponse=0x0011\n");
-		fprintf(f, "OP_SystemFingerprint=0x0016\n");
-		fprintf(f, "OP_ExpansionList=0x0031\n");
-		fclose(f);
-	}
+	return &opcodes;
 }
 
 ClientManager::ClientManager()
 {
+	//
+	// Titanium Login Protocol Support
+	//
+
 	int titanium_port = server.config.GetVariableInt("client_configuration", "titanium_port", 5998);
+	std::string titanium_opcodes_file = server.config.GetVariableString("client_configuration",
+		"titanium_opcodes", "login_opcodes.conf");
 
 	EQStreamManagerInterfaceOptions titanium_opts(titanium_port, false, false);
-
 	m_titanium_stream = new EQ::Net::EQStreamManager(titanium_opts);
-	m_titanium_ops    = new OpcodeManager();
 
-	std::string opcodes_path = fmt::format(
-		"{}/{}",
-		PathManager::Instance()->GetOpcodePath(),
-		"login_opcodes.conf"
-	);
+	std::string titanium_opcodes_path = PathManager::Instance()->FindFilePath(PathLocation::Opcodes, titanium_opcodes_file);
+	m_titanium_ops = new OpcodeManager("login_titanium", GetTitaniumLoginOpcodes());
 
-	CheckTitaniumOpcodeFile(opcodes_path);
-
-	if (!m_titanium_ops->LoadOpcodes(opcodes_path.c_str())) {
-		LogError(
-			"ClientManager fatal error: couldn't load opcodes for Titanium file [{}]",
-			server.config.GetVariableString("client_configuration", "titanium_opcodes", "login_opcodes.conf")
-		);
-
+	if (!m_titanium_ops->LoadOpcodes(titanium_opcodes_path))
+	{
+		LogError("ClientManager fatal error: couldn't load opcodes for Titanium file [{}]", titanium_opcodes_file);
 		run_server = false;
 	}
 
@@ -136,31 +91,28 @@ ClientManager::ClientManager()
 			);
 
 			stream->SetOpcodeManager(&m_titanium_ops);
-			Client *c = new Client(stream, cv_titanium);
+			Client* c = new Client(stream, cv_titanium);
 			m_clients.push_back(c);
 		}
 	);
 
+	//
+	// SOD Login Protocol Support
+	//
+
 	int sod_port = server.config.GetVariableInt("client_configuration", "sod_port", 5999);
+	std::string sod_opcodes_file = server.config.GetVariableString("client_configuration",
+		"sod_opcodes", "login_opcodes.conf");
 
 	EQStreamManagerInterfaceOptions sod_opts(sod_port, false, false);
 	m_sod_stream = new EQ::Net::EQStreamManager(sod_opts);
-	m_sod_ops    = new OpcodeManager();
 
-	opcodes_path = fmt::format(
-		"{}/{}",
-		PathManager::Instance()->GetOpcodePath(),
-		"login_opcodes_sod.conf"
-	);
+	std::string sod_opcodes_path = PathManager::Instance()->FindFilePath(PathLocation::Opcodes, sod_opcodes_file);
+	m_sod_ops = new OpcodeManager("login_sod", GetSodLoginOpcodes());
 
-	CheckSoDOpcodeFile(opcodes_path);
-
-	if (!m_sod_ops->LoadOpcodes(opcodes_path.c_str())) {
-		LogError(
-			"ClientManager fatal error: couldn't load opcodes for SoD file {}",
-			server.config.GetVariableString("client_configuration", "sod_opcodes", "login_opcodes.conf").c_str()
-		);
-
+	if (!m_sod_ops->LoadOpcodes(sod_opcodes_path))
+	{
+		LogError("ClientManager fatal error: couldn't load opcodes for SoD file [{}]", sod_opcodes_file);
 		run_server = false;
 	}
 
@@ -173,32 +125,28 @@ ClientManager::ClientManager()
 			);
 
 			stream->SetOpcodeManager(&m_sod_ops);
-			auto *c = new Client(stream, cv_sod);
+			auto* c = new Client(stream, cv_sod);
 			m_clients.push_back(c);
 		}
 	);
 
+	//
+	// Steam-Latest Login Protocol Support
+	//
+
 	int steam_latest_port = server.config.GetVariableInt("client_configuration", "steam_latest_port", 15900);
+	std::string steam_latest_opcodes_file = server.config.GetVariableString("client_configuration",
+		"steam_latest_opcodes", "login_opcodes_steam_latest.conf");
 
 	EQStreamManagerInterfaceOptions steam_latest_opts(steam_latest_port, false, false);
-
 	m_steam_latest_stream = new EQ::Net::EQStreamManager(steam_latest_opts);
-	m_steam_latest_ops    = new OpcodeManager();
 
-	opcodes_path = fmt::format(
-		"{}/{}",
-		PathManager::Instance()->GetOpcodePath(),
-		"login_opcodes_steam_latest.conf"
-	);
+	std::string steam_latest_opcodes_path = PathManager::Instance()->FindFilePath(PathLocation::Opcodes, steam_latest_opcodes_file);
+	m_steam_latest_ops = new OpcodeManager("log_steam_latest", GetSteamLatestLoginOpcodes());
 
-	CheckSteamLatestOpcodeFile(opcodes_path);
-
-	if (!m_steam_latest_ops->LoadOpcodes(opcodes_path.c_str())) {
-		LogError(
-			"ClientManager fatal error: couldn't load opcodes for Steam Latest file [{}]",
-			server.config.GetVariableString("client_configuration", "steam_latest_opcodes", "login_opcodes.conf")
-		);
-
+	if (!m_steam_latest_ops->LoadOpcodes(steam_latest_opcodes_path))
+	{
+		LogError("ClientManager fatal error: couldn't load opcodes for Steam Latest file [{}]", steam_latest_opcodes_file);
 		run_server = false;
 	}
 
@@ -211,7 +159,7 @@ ClientManager::ClientManager()
 			);
 
 			stream->SetOpcodeManager(&m_steam_latest_ops);
-			Client *c = new Client(stream, cv_steam_latest);
+			Client* c = new Client(stream, cv_steam_latest);
 			m_clients.push_back(c);
 		}
 	);

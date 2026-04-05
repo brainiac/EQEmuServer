@@ -125,52 +125,82 @@ void PathManager::Init()
 	LogInfo("{}", Strings::Repeat("-", break_length));
 }
 
-const std::string &PathManager::GetServerPath() const
+const std::string& PathManager::GetServerPath() const
 {
 	return m_server_path;
 }
 
-const std::string &PathManager::GetMapsPath() const
+const std::string& PathManager::GetMapsPath() const
 {
 	return m_maps_path;
 }
 
-const std::string &PathManager::GetSharedMemoryPath() const
+const std::string& PathManager::GetSharedMemoryPath() const
 {
 	return m_shared_memory_path;
 }
 
-std::vector<std::string> PathManager::GetQuestPaths() const
+const std::vector<std::string>& PathManager::GetQuestPaths() const
 {
 	return m_quests_paths;
 }
 
-std::vector<std::string> PathManager::GetPluginPaths() const
+const std::vector<std::string>& PathManager::GetPluginPaths() const
 {
 	return m_plugin_paths;
 }
 
-std::vector<std::string> PathManager::GetLuaModulePaths() const
+const std::vector<std::string>& PathManager::GetLuaModulePaths() const
 {
 	return m_lua_module_paths;
 }
 
-const std::string &PathManager::GetLogPath() const
+const std::string& PathManager::GetLogPath() const
 {
 	return m_log_path;
 }
 
-const std::string &PathManager::GetPatchPath() const
+const std::string& PathManager::GetPatchPath() const
 {
 	return m_patch_path;
 }
 
-const std::string &PathManager::GetOpcodePath() const
+const std::string& PathManager::GetOpcodePath() const
 {
 	return m_opcode_path;
 }
 
-const std::string &PathManager::GetLuaModsPath() const
+const std::string& PathManager::GetLuaModsPath() const
 {
 	return m_lua_mods_path;
+}
+
+std::string PathManager::FindFilePath(PathLocation location, const std::string& fileName)
+{
+	std::error_code ec;
+
+	switch (location)
+	{
+	case PathLocation::Patches:
+	{
+		fs::path fullPath = fs::path{ m_patch_path } / fileName;
+		if (fs::is_regular_file(fullPath, ec))
+			return fullPath.string();
+
+		return {};
+	}
+
+	case PathLocation::Opcodes:
+	{
+		fs::path fullPath = fs::path{ m_opcode_path } / fileName;
+		if (fs::is_regular_file(fullPath, ec))
+			return fullPath.string();
+
+		return {};
+	}
+
+	default: break;
+	}
+
+	return {};
 }

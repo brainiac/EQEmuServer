@@ -655,11 +655,16 @@ set(common_headers
     opcode_manager.h
     packet_dump.h
     packet_dump_file.h
+    patches/login_sod_opcodes.h
+    patches/login_steam_latest_opcodes.h
+    patches/login_titanium_opcodes.h
+    patches/opcodes.h
     patches/patches.h
     patches/rof.h
     patches/rof2.h
     patches/rof2_limits.h
     patches/rof2_ops.h
+    patches/rof2_opcodes.h
     patches/rof2_structs.h
     patches/rof_limits.h
     patches/rof_ops.h

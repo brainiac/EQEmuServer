@@ -475,7 +475,7 @@ Clientlist::Clientlist(int ChatPort) {
 
 	chatsf = new EQ::Net::EQStreamManager(chat_opts);
 
-	ChatOpMgr = new OpcodeManager();
+	ChatOpMgr = new OpcodeManager("ucs");
 
 	const ucsconfig *Config = ucsconfig::get();
 

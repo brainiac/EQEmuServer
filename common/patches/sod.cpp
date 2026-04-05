@@ -70,8 +70,7 @@ namespace SoD
 		if (opcodes == nullptr) {
 			std::string opfile = fmt::format("{}/patch_{}.conf", PathManager::Instance()->GetPatchPath(), name);
 			//load up the opcode manager.
-			//TODO: figure out how to support shared memory with multiple patches...
-			opcodes = new OpcodeManager();
+			opcodes = new OpcodeManager(name);
 			if (!opcodes->LoadOpcodes(opfile.c_str())) {
 				LogNetcode("[OPCODES] Error loading opcodes file [{}]. Not registering patch [{}]", opfile.c_str(), name);
 				return;
@@ -110,7 +109,7 @@ namespace SoD
 
 		if (opcodes != nullptr) {
 			std::string opfile = fmt::format("{}/patch_{}.conf", PathManager::Instance()->GetPatchPath(), name);
-			if (!opcodes->ReloadOpcodes(opfile.c_str())) {
+			if (!opcodes->LoadOpcodes(opfile.c_str())) {
 				LogNetcode("[OPCODES] Error reloading opcodes file [{}] for patch [{}]", opfile.c_str(), name);
 				return;
 			}
