@@ -16,7 +16,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "opcodemgr.h"
+#include "opcode_manager.h"
 
 #include "common/emu_opcodes.h"
 #include "common/eqemu_logsys.h"

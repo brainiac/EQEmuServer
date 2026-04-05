@@ -28,7 +28,7 @@
 #include "common/misc.h"
 #include "common/mutex.h"
 #include "common/net/eqstream.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #include "common/patches/patches.h"
 #include "common/path_manager.h"
 #include "common/platform/posix/include_pthreads.h"

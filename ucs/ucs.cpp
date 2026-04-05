@@ -22,7 +22,7 @@
 #include "common/events/player_event_logs.h"
 #include "common/net/servertalk_client_connection.h"
 #include "common/net/tcp_server.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #include "common/path_manager.h"
 #include "common/platform.h"
 #include "common/rulesys.h"

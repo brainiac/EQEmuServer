@@ -2,7 +2,7 @@
 #include "../eqemu_config.h"
 #include "../eqemu_logsys.h"
 #include "steam_latest.h"
-#include "../opcodemgr.h"
+#include "../opcode_manager.h"
 
 #include "../eq_stream_ident.h"
 #include "../crc32.h"

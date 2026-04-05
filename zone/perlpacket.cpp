@@ -18,7 +18,7 @@
 #include "perlpacket.h"
 
 #include "common/misc_functions.h"
-#include "common/opcodemgr.h"
+#include "common/opcode_manager.h"
 #include "zone/client.h"
 
 PerlPacket::PerlPacket(const char *opcode, uint32 length) {

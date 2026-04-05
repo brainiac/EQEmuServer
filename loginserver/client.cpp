@@ -15,10 +15,13 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "client.h"
-#include "login_server.h"
-#include "encryption.h"
-#include "account_management.h"
+
+#include "common/opcode_manager.h"
+#include "loginserver/login_server.h"
+#include "loginserver/encryption.h"
+#include "loginserver/account_management.h"
 
 extern LoginServer server;
 

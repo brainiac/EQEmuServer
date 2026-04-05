@@ -15,8 +15,10 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "common/eqemu_logsys.h"
 #include "common/misc_functions.h"
+#include "common/opcode_manager.h"
 #include "common/path_manager.h"
 #include "common/strings.h"
 #include "ucs/chatchannel.h"
