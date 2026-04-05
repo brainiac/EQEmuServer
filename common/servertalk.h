@@ -20,7 +20,6 @@
 #include "common/eq_packet_structs.h"
 #include "common/guilds.h"
 #include "common/net/packet.h"
-#include "common/packet_functions.h"
 #include "common/types.h"
 
 #include "cereal/cereal.hpp"

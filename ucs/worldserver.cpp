@@ -22,7 +22,6 @@
 #include "common/events/player_event_logs.h"
 #include "common/md5.h"
 #include "common/misc_functions.h"
-#include "common/packet_functions.h"
 #include "common/server_reload_types.h"
 #include "common/servertalk.h"
 #include "common/strings.h"
