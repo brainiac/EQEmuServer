@@ -23,7 +23,6 @@
 #include "common/md5.h"
 #include "common/net/packet.h"
 #include "common/packet_dump.h"
-#include "common/packet_functions.h"
 #include "common/server_reload_types.h"
 #include "common/servertalk.h"
 #include "queryserv/database.h"

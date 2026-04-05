@@ -84,7 +84,6 @@ set(common_sources
 	opcode_manager.cpp
 	packet_dump_file.cpp
 	packet_dump.cpp
-	packet_functions.cpp
 	patches/client_version.cpp
 	patches/patches.cpp
 	patches/rof_limits.cpp
@@ -649,12 +648,10 @@ set(common_headers
 	net/tcp_server.h
 	net/websocket_server_connection.h
 	net/websocket_server.h
-	op_codes.h
 	opcode_dispatch.h
 	opcode_manager.h
 	packet_dump_file.h
 	packet_dump.h
-	packet_functions.h
 	patches/IBuff.h
 	patches/IMessage.h
 	patches/client_version.h
