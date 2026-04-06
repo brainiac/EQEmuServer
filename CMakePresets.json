@@ -33,14 +33,26 @@
         "EQEMU_BUILD_LOGIN": "ON"
       }
     },
-  {
+    {
       "name": "win-msvc",
       "displayName": "Windows MSVC (VS 2022)",
       "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/build/${presetName}",
+      "binaryDir": "${sourceDir}/build",
       "architecture": { "value": "x64" },
       "cacheVariables": {
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+        "EQEMU_BUILD_LOGIN": "ON",
+        "EQEMU_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "win-msvc-2026",
+      "displayName": "Windows MSVC (VS 2026)",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/build",
+      "architecture": { "value": "x64" },
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;ReleaseWithDebInfo",
         "EQEMU_BUILD_LOGIN": "ON",
         "EQEMU_BUILD_TESTS": "ON"
       }
