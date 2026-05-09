@@ -655,8 +655,8 @@ set(common_headers
 	patches/IBuff.h
 	patches/IMessage.h
 	patches/login_sod_opcodes.h
-	patches/login_steam_latest_opcodes.h
 	patches/login_titanium_opcodes.h
+	patches/login_tob_opcodes.h
 	patches/opcodes.h
 	patches/patches.h
 	patches/rof_limits.h
@@ -664,6 +664,7 @@ set(common_headers
 	patches/rof_structs.h
 	patches/rof.h
 	patches/rof2_limits.h
+	patches/rof2_opcodes.h
 	patches/rof2_ops.h
 	patches/rof2_structs.h
 	patches/rof2.h
@@ -682,10 +683,10 @@ set(common_headers
 	patches/titanium_ops.h
 	patches/titanium_structs.h
 	patches/titanium.h
-	patches/tob.h
 	patches/tob_limits.h
 	patches/tob_ops.h
 	patches/tob_structs.h
+	patches/tob.h
 	patches/uf_limits.h
 	patches/uf_ops.h
 	patches/uf_structs.h

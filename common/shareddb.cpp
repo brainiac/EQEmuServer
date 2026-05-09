@@ -906,6 +906,8 @@ bool SharedDatabase::LoadItems(const std::string &prefix) {
 		EQ::IPCMutex mutex("items");
 		mutex.Lock();
 		std::string file_name = fmt::format("{}/{}{}", PathManager::Instance()->GetSharedMemoryPath(), prefix, std::string("items"));
+		LogInfo("Load Items: [{}]", file_name);
+		LogInfo("Server Path: [{}]", PathManager::Instance()->GetServerPath());
 		items_mmf = std::make_unique<EQ::MemoryMappedFile>(file_name);
 		items_hash = std::make_unique<EQ::FixedMemoryHashSet<EQ::ItemData>>(static_cast<uint8*>(items_mmf->Get()), items_mmf->Size());
 		mutex.Unlock();

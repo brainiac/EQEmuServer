@@ -29,6 +29,7 @@ namespace fs = std::filesystem;
 void PathManager::Init()
 {
 	m_server_path = File::FindEqemuConfigPath();
+	LogInfo("ServerPath: {}", m_server_path);
 
 	if (m_server_path.empty()) {
 		LogInfo("Failed to load server path");

@@ -715,8 +715,12 @@ void WorldServer::SerializeForClientServerList(SerializeBuffer &out, bool use_lo
 		}
 
 		out.WriteInt32(9000); // port, not currently settable in eqemu but needed for compat
+		out.WriteInt32(0);
 
-		switch (GetServerListID()) {
+		uint32_t serverType = GetServerListID();
+		//serverType = LS::ServerTypeFlags::Legends;
+		switch (serverType)
+		{
 		case LS::ServerType::Legends:
 			out.WriteInt32(LS::ServerTypeFlags::Legends);
 			break;
@@ -724,22 +728,32 @@ void WorldServer::SerializeForClientServerList(SerializeBuffer &out, bool use_lo
 			out.WriteInt32(LS::ServerTypeFlags::Preferred);
 			break;
 		default:
-			out.WriteInt32(LS::ServerTypeFlags::Standard);
+			out.WriteInt32(-1);
 			break;
 		}
 
-		out.WriteInt32(289); //unsure what this is yet
 		out.WriteUInt32(m_server_id);
-
 		out.WriteString(m_server_long_name);
 		out.WriteString("US"); // country code
 		out.WriteString("EN"); // language code
-		out.WriteString("Standard");
+
+		switch (serverType)
+		{
+		case LS::ServerType::Legends:
+			out.WriteString("Legends");
+			break;
+		case LS::ServerType::Preferred:
+			out.WriteString("Preferred");
+			break;
+		default:
+			out.WriteString("Standard");
+			break;
+		}
 		out.WriteString("This server has no description set currently.");
 
 		if (GetStatus() < 0) {
 			if (GetZonesBooted() == 0) {
-				out.WriteInt32(LS::ServerStatusFlags::Down);
+				out.WriteInt32(LS::ServerStatusFlags::Up);
 			}
 			else {
 				out.WriteInt32(LS::ServerStatusFlags::Locked);
@@ -749,9 +763,10 @@ void WorldServer::SerializeForClientServerList(SerializeBuffer &out, bool use_lo
 			out.WriteInt32(LS::ServerStatusFlags::Up);
 		}
 
-		out.WriteUInt32(GetPlayersOnline());
-		out.WriteInt32(31); //expansions
-		out.WriteInt32(0); //truebox
+		out.WriteUInt32(GetPlayersOnline() + 100);
+
+		out.WriteInt32(7); // expansions
+		out.WriteInt32(2); // truebox: 0 = No, 1 = Yes, 2 = Relaxed
 	}
 	else {
 		// see LoginClientServerData_Struct
