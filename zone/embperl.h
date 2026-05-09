@@ -27,8 +27,13 @@ Eglin
 #ifdef EMBPERL
 
 #include "zone_config.h"
+#include "common/compiler_macros.h"
 
+PUSH_WARNINGS()
+GCC_DISABLE_WARNING("-Wvolatile")
 #include "perlbind/perlbind.h"
+POP_WARNINGS()
+
 #include <cstdio>
 #include <cstring>
 #include <map>
