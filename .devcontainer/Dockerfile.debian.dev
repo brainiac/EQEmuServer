@@ -1,59 +1,50 @@
-FROM mcr.microsoft.com/devcontainers/base:debian as base
+FROM mcr.microsoft.com/devcontainers/base:debian AS base
 RUN sudo apt update \
 	&& sudo apt install -y --no-install-recommends \
+		autoconf \
+		automake \
 		build-essential \
-		libtool \
+		ccache \
+		clang \
+		clang-tools \
 		cmake \
 		curl \
 		debconf-utils \
+		gdb \
 		git \
-		libluabind-dev \
-		libsodium-dev \
-		liblua5.2-0 \
-		liblua5.2-dev \
-		libmariadb-dev \
-		libssl-dev \
-		minizip \
+		google-perftools \
+		iputils-ping \
+		libtool \
+		linux-libc-dev \
+		locales \
 		make \
 		mariadb-client \
-		locales \
+		mariadb-server \
+		minizip \
 		nano \
-		open-vm-tools \
-		unzip \
-		uuid-dev \
-		iputils-ping \
-		wget \
-		libcurl4-openssl-dev \
-		gdb \
-		libyaml-cpp-dev \
-		ccache \
 		ninja-build \
+		open-vm-tools \
 		pv \
-		mariadb-server \
-		libperl-dev \
-		libjson-perl \
-		libio-stringy-perl \
-		liblua5.1-dev \
-		libluabind-dev \
-		libboost-dev \
-		mariadb-server \
-		valgrind \
+		sudo \
 		telnet \
-		libgoogle-perftools-dev \
-		google-perftools
+		unzip \
+		valgrind \
+		wget
 
 
-FROM base as devcontainer
+FROM base AS devcontainer
 
 # This is a "dev" image for running eqemu in development, also for dev containers
 ARG REMOTE_USER
 ARG REMOTE_UID
 ARG REMOTE_GID
 
-RUN <<EOF
-	addgroup --gid ${REMOTE_GID} ${REMOTE_USER}
-	adduser --disabled-password --uid ${REMOTE_UID} --gid ${REMOTE_GID} ${REMOTE_USER}
-EOF
+# Create the user
+RUN echo "Creating user $REMOTE_USER with UID $REMOTE_UID and GID $REMOTE_GID a"
+RUN groupmod -g 1001 vscode && usermod -u 1001 -g 1001 vscode
+RUN groupadd --gid $REMOTE_UID $REMOTE_USER
+RUN useradd --uid $REMOTE_UID --gid $REMOTE_GID -m $REMOTE_USER
+RUN echo $REMOTE_USER ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$REMOTE_USER
+RUN chmod 0440 /etc/sudoers.d/$REMOTE_USER
 
-ENV HOME /home/${REMOTE_USER}
 USER ${REMOTE_USER}

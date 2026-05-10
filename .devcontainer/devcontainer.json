@@ -70,8 +70,18 @@
 			}
 		}
 	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": "true",
+			"configureZshAsDefaultShell": "true",
+			"username": "${localEnv:USER}",
+			"userUid": "${localEnv:REMOTE_UID:1000}",
+			"userGid": "${localEnv:REMOTE_GID:1000}"
+		}
+	},
 	"mounts": [
-		"source=${localWorkspaceFolder}/.devcontainer/Makefile,target=/src/Makefile,type=bind,consistency=cached"
+		"source=${localWorkspaceFolder}/.devcontainer/Makefile,target=/src/Makefile,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=${localEnv:HOME}/.ssh,type=bind,consistency=cached"
 	],
 
 	"workspaceFolder": "/src",
