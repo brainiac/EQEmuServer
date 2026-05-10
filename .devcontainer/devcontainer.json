@@ -2,9 +2,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
 	"name": "eqemu",
-	"build": {
-		"dockerfile": "Dockerfile.debian.dev"
-	},
+
 	"appPort": [
 		"5998:5998/udp",
 		"7000:7000/udp",
@@ -16,6 +14,18 @@
 		"9000:9000/udp",
 		"9001:9001/udp"
 	],
+	"build": {
+		"dockerfile": "Dockerfile.debian.dev",
+		"args": {
+			"REMOTE_USER": "${localEnv:USER}",
+			"REMOTE_UID": "${localEnv:REMOTE_UID:1000}",
+			"REMOTE_GID": "${localEnv:REMOTE_GID:1000}"
+		},
+		"target": "devcontainer",
+		"context": ".."
+	},
+
+	"containerUser": "vscode",
 	"forwardPorts": [
 		3306
 	],
@@ -23,56 +33,45 @@
 		"LOCALWSF": "${localWorkspaceFolder}",
 		"CONTAINERWSF": "${containerWorkspaceFolder}"
 	},
-	"containerUser": "vscode",
-	// add ptrace
+	"remoteUser": "${localEnv:USER}",
 	"runArgs": [
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined"
 	],
+
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-vscode.cpptools-extension-pack",
-				"vilicvane.sensitive-replace",
-				"maattdd.gitless",
 				"bibhasdn.unique-lines",
+				"editorconfig.editorconfig",
 				"GitHub.copilot",
-				"xackery.make-magic",
 				"Gruntfuggly.todo-tree",
+				"maattdd.gitless",
 				"ms-vscode.cmake-tools",
-				"sumneko.lua"
+				"ms-vscode.cpptools-extension-pack",
+				"sumneko.lua",
+				"vilicvane.sensitive-replace",
+				"xackery.make-magic"
 			],
 			"settings": {
+				"cmake.configureOnOpen": false,
+				"cmake.skipConfigureIfCachePresent": true,
+				"files.watcherExclude": {
+					"submodules/vcpkg/**": true
+				},
 				"Lua.runtime.version": "Lua 5.1",
-			    "Lua.workspace.library": [
-			        "/src/repo/eqemu-definitions"
-			    ],
-			    "Lua.diagnostics.disable": [
-			        "lowercase-global"
-			    ],
-				"cmake.statusbar.advanced": {
-					"kit": {
-						"visibility": "hidden"
-					},
-					"debug": {
-						"visibility": "hidden"
-					},
-					"buildTarget": {
-						"visibility": "compact"
-					},
-					"launch": {
-						"visibility": "hidden"
-					},
-					"ctest": {
-						"visibility": "icon"
-					}
-				}
+				"Lua.workspace.library": [
+					"/src/repo/eqemu-definitions"
+				],
+				"Lua.diagnostics.disable": [
+					"lowercase-global"
+				]
 			}
 		}
 	},
 	"mounts": [
-    "source=${localWorkspaceFolder}/.devcontainer/Makefile,target=/src/Makefile,type=bind,consistency=cached"
+		"source=${localWorkspaceFolder}/.devcontainer/Makefile,target=/src/Makefile,type=bind,consistency=cached"
 	],
 
 	"workspaceFolder": "/src",
